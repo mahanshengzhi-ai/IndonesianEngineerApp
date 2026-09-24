@@ -19,9 +19,14 @@ import com.mahanshengzhi.indonesianengineer.translation.TranslationEngine
 import com.mahanshengzhi.indonesianengineer.ui.HomePage
 import com.mahanshengzhi.indonesianengineer.ui.PracticePage
 import com.mahanshengzhi.indonesianengineer.ui.ProfilePage
+import com.mahanshengzhi.indonesianengineer.ui.QuizPage
+import com.mahanshengzhi.indonesianengineer.ui.SceneDetailPage
+import com.mahanshengzhi.indonesianengineer.ui.ScenePage
+import com.mahanshengzhi.indonesianengineer.ui.SentencePage
 import com.mahanshengzhi.indonesianengineer.ui.StudyPage
 import com.mahanshengzhi.indonesianengineer.ui.TranslatePage
 import com.mahanshengzhi.indonesianengineer.ui.Ui
+import com.mahanshengzhi.indonesianengineer.ui.VocabularyPage
 
 @UnstableApi
 class MainActivity : AppCompatActivity() {
@@ -36,7 +41,6 @@ class MainActivity : AppCompatActivity() {
     private val audioPlayer by lazy { AudioPlayer(this) }
 
     private var lastBackAt = 0L
-    private var playingText = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,12 +78,12 @@ class MainActivity : AppCompatActivity() {
         val page = when (itemId) {
             R.id.nav_home -> HomePage.build(
                 this,
-                learned = progress.learnedTotal(),
-                streak = progress.streak(),
-                dailyWords = progress.dailyWords(),
-                dailyAudio = progress.dailyAudio(),
-                dailyQuiz = progress.dailyQuiz(),
-                dailyTranslation = progress.dailyTranslation(),
+                progress.learnedTotal(),
+                progress.streak(),
+                progress.dailyWords(),
+                progress.dailyAudio(),
+                progress.dailyQuiz(),
+                progress.dailyTranslation(),
                 onStart = { bottomNavigation.selectedItemId = R.id.nav_learn },
                 onCheckIn = {
                     progress.checkIn()
@@ -91,8 +95,12 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_learn -> StudyPage.build(
                 this,
                 repository,
-                onPlay = ::playAudio,
-                hasAudio = audioPlayer::hasAudio,
+                audioPlayer::hasAudio,
+                ::playAudio,
+                onOpenVocabulary = { showSubPage(VocabularyPage.build(this, repository, audioPlayer::hasAudio, ::playAudio) { progress.markLearned(it); progress.markDailyWord() }) },
+                onOpenSentences = { showSubPage(SentencePage.build(this, repository, audioPlayer::hasAudio, ::playAudio)) },
+                onOpenScenes = { showSubPage(ScenePage.build(this, repository) { id -> showSubPage(SceneDetailPage.build(this, repository, id, audioPlayer::hasAudio, ::playAudio)) }) },
+                onOpenPractice = { bottomNavigation.selectedItemId = R.id.nav_practice },
                 onMarkLearned = {
                     progress.markLearned(it)
                     progress.markDailyWord()
@@ -101,12 +109,7 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_practice -> PracticePage.build(
                 this,
                 progress,
-                onMarkQuiz = {
-                    progress.incrementQuiz()
-                    progress.updateBestQuiz(7)
-                    Toast.makeText(this, "这一组完成，已记录 7 / 10", Toast.LENGTH_SHORT).show()
-                    renderPage(R.id.nav_practice)
-                }
+                onStartQuiz = { showSubPage(QuizPage.build(this, repository, progress) { bottomNavigation.selectedItemId = R.id.nav_practice }) }
             )
             R.id.nav_translate -> TranslatePage.build(this, translationEngine, progress)
             R.id.nav_profile -> ProfilePage.build(this, progress)
@@ -117,21 +120,20 @@ class MainActivity : AppCompatActivity() {
         }
 
         contentContainer.removeAllViews()
-        val scroll = Ui.scroll(this, page)
-        contentContainer.addView(scroll)
+        contentContainer.addView(Ui.scroll(this, page))
+    }
+
+    private fun showSubPage(page: LinearLayout) {
+        contentContainer.removeAllViews()
+        contentContainer.addView(Ui.scroll(this, page))
     }
 
     private fun playAudio(text: String) {
-        if (text.isBlank()) {
-            Toast.makeText(this, "暂无内置语音", Toast.LENGTH_SHORT).show()
-            return
-        }
-        if (!audioPlayer.hasAudio(text)) {
+        if (text.isBlank() || !audioPlayer.hasAudio(text)) {
             Toast.makeText(this, "暂无内置语音", Toast.LENGTH_SHORT).show()
             return
         }
         if (audioPlayer.play(text)) {
-            playingText = text
             progress.incrementAudio()
             showPlayer(text)
         } else {
@@ -146,14 +148,13 @@ class MainActivity : AppCompatActivity() {
             setPadding(Ui.dp(this@MainActivity, 16), Ui.dp(this@MainActivity, 10), Ui.dp(this@MainActivity, 16), Ui.dp(this@MainActivity, 10))
         }
 
-        val title = TextView(this).apply {
+        box.addView(TextView(this).apply {
             this.text = text
             textSize = 15f
             setTextColor(ContextCompat.getColor(context, R.color.text_primary))
             includeFontPadding = true
             maxLines = 2
-        }
-        box.addView(title)
+        })
 
         val actions = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
@@ -170,7 +171,6 @@ class MainActivity : AppCompatActivity() {
             audioPlayer.pause()
             playerContainer.removeAllViews()
             playerContainer.visibility = View.GONE
-            playingText = ""
         }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
             leftMargin = Ui.dp(this@MainActivity, 6)
         })

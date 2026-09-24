@@ -5,7 +5,7 @@ import android.widget.LinearLayout
 import com.mahanshengzhi.indonesianengineer.data.ProgressStore
 
 object PracticePage {
-    fun build(context: Context, store: ProgressStore, onMarkQuiz: () -> Unit): LinearLayout {
+    fun build(context: Context, store: ProgressStore, onStartQuiz: () -> Unit): LinearLayout {
         val root = Ui.page(context)
         root.addView(Ui.title(context, "练习"))
         root.addView(Ui.subtitle(context, "把今天学过的内容再拿出来一次，记忆会更牢。").apply {
@@ -17,8 +17,8 @@ object PracticePage {
         add(root, context, "发音辨认", "只播放预录音频，让耳朵先建立声音和词义的连接")
         add(root, context, "最佳成绩", "当前最佳成绩：" + store.bestQuiz() + " / 10")
 
-        root.addView(Ui.card(context, Ui.button(context, "模拟完成一组 10 题") {
-            onMarkQuiz()
+        root.addView(Ui.card(context, Ui.button(context, "开始 10 题挑战") {
+            onStartQuiz()
         }))
         return root
     }

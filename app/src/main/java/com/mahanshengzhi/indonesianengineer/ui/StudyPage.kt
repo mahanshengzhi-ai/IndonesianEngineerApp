@@ -10,8 +10,12 @@ object StudyPage {
     fun build(
         context: Context,
         repository: LearningRepository,
-        onPlay: (String) -> Unit,
         hasAudio: (String) -> Boolean,
+        onPlay: (String) -> Unit,
+        onOpenVocabulary: () -> Unit,
+        onOpenSentences: () -> Unit,
+        onOpenScenes: () -> Unit,
+        onOpenPractice: () -> Unit,
         onMarkLearned: (String) -> Unit
     ): LinearLayout {
         val root = Ui.page(context)
@@ -20,18 +24,10 @@ object StudyPage {
             setPadding(0, Ui.dp(context, 7), 0, Ui.dp(context, 18))
         })
 
-        addModule(root, context, "01  发音入门", "26 个字母、常见组合与印尼语发音规律", repository.letters().size.toString() + " 个字母")
-        addModule(root, context, "02  核心词汇", "按分类和场景学习，不把全部词一次性堆出来", repository.vocabulary().count().toString() + " 个词")
-        addModule(root, context, "03  常用句型", "40 句现场可以直接套用的表达", repository.sentences().size.toString() + " 个句型")
-        addModule(root, context, "04  真实场景", "从第一次到工地到日报会议，完整学习交流过程", repository.scenes().size.toString() + " 个场景")
-
-        val tip = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
-        tip.addView(Ui.label(context, "学习顺序"))
-        tip.addView(Ui.body(context, "字母发音 → 核心词汇 → 核心句型 → 真实场景").apply { textSize = 18f })
-        tip.addView(Ui.body(context, "每次只学一小组，学完马上进入回忆和应用。").apply {
-            setPadding(0, Ui.dp(context, 8), 0, 0)
-        })
-        root.addView(Ui.card(context, tip))
+        module(root, context, "01  发音入门", "26 个字母、常见组合与印尼语发音规律", repository.letters().size.toString() + " 个字母")
+        module(root, context, "02  核心词汇", "打开词卡，搜索你今天真正要用的词", repository.vocabulary().count().toString() + " 个词", onOpenVocabulary)
+        module(root, context, "03  常用句型", "40 句现场可以直接套用的表达", repository.sentences().size.toString() + " 个句型", onOpenSentences)
+        module(root, context, "04  真实场景", "从第一次到工地到日报会议，完整走完一次交流", repository.scenes().size.toString() + " 个场景", onOpenScenes)
 
         val first = repository.vocabulary().firstOrNull()
         if (first != null) {
@@ -45,23 +41,37 @@ object StudyPage {
             word.addView(Ui.body(context, first.chinese).apply { setPadding(0, Ui.dp(context, 4), 0, 0) })
             val available = hasAudio(first.indonesian)
             val audioButton = Ui.button(context, if (available) "听一下" else "暂无内置语音") {
-                if (available) {
-                    onPlay(first.indonesian)
-                    onMarkLearned(first.id)
-                }
+                if (available) onPlay(first.indonesian)
             }
             audioButton.isEnabled = available
             word.addView(audioButton.apply { setPadding(0, Ui.dp(context, 12), 0, 0) })
+            word.addView(Ui.button(context, "我会了") {
+                onMarkLearned(first.id)
+            })
             root.addView(Ui.card(context, word))
         }
+
+        root.addView(Ui.card(context, Ui.button(context, "去练习") { onOpenPractice() }))
         return root
     }
 
-    private fun addModule(root: LinearLayout, context: Context, title: String, desc: String, count: String) {
+    private fun module(
+        root: LinearLayout,
+        context: Context,
+        title: String,
+        desc: String,
+        count: String,
+        onClick: (() -> Unit)? = null
+    ) {
         val box = LinearLayout(context).apply { orientation = LinearLayout.VERTICAL }
         box.addView(Ui.label(context, title))
         box.addView(Ui.body(context, desc).apply { setPadding(0, Ui.dp(context, 5), 0, 0) })
         box.addView(Ui.label(context, count).apply { setPadding(0, Ui.dp(context, 9), 0, 0) })
+        if (onClick != null) {
+            box.addView(Ui.button(context, "打开") { onClick() }.apply {
+                setPadding(0, Ui.dp(context, 10), 0, 0)
+            })
+        }
         root.addView(Ui.card(context, box))
     }
 }
