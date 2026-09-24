@@ -3,13 +3,13 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import os
 import re
+import shutil
 import subprocess
 import tempfile
-import os
-import shutil
-import time
 import unicodedata
+import zipfile
 from pathlib import Path
 from urllib.parse import unquote
 
@@ -17,18 +17,21 @@ import requests
 
 ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app" / "src" / "main" / "assets"
-CATEGORY = "Category:Lingua Libre pronunciation-ind"
-API = "https://commons.wikimedia.org/w/api.php"
-UA = "IndonesianEngineerApp/0.2 (open-source audio build; contact: mahanshengzhi-ai)"
-MAX_AUDIO = 300
+DATASET_URL = "https://lingualibre.org/datasets/Q305-ind-Indonesian.zip"
+UA = "IndonesianEngineerApp/0.3 (LinguaLibre dataset audio build; contact: mahanshengzhi-ai)"
+MAX_AUDIO = 3704
+
 
 def normalize(text: str) -> str:
     text = unicodedata.normalize("NFC", text or "")
+    text = text.replace("_", " ")
     return re.sub(r"\s+", " ", text.strip()).lower()
+
 
 def read_tsv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f, delimiter="\t"))
+
 
 def desired_texts() -> list[str]:
     texts: list[str] = []
@@ -38,132 +41,93 @@ def desired_texts() -> list[str]:
                 texts.append(row["indonesian"])
     for name in ("sentences.tsv", "scenes.tsv"):
         for row in read_tsv(ASSETS / name):
-            key = "indonesian"
-            if row.get(key):
-                texts.append(row[key])
+            if row.get("indonesian"):
+                texts.append(row["indonesian"])
     for row in read_tsv(ASSETS / "letters.tsv"):
         if row.get("example"):
             texts.append(row["example"])
+
     unique: dict[str, str] = {}
     for text in texts:
         unique.setdefault(normalize(text), text)
     return list(unique.values())
 
-def get_json(session: requests.Session, params: dict) -> dict:
-    for attempt in range(7):
-        response = session.get(API, params=params, timeout=60)
-        if response.status_code != 429:
-            response.raise_for_status()
-            return response.json()
-        retry_after = response.headers.get("Retry-After")
-        delay = float(retry_after) if retry_after else min(30.0, 2.0 ** attempt)
-        print("Wikimedia API rate limited; retrying in", delay, "seconds")
-        time.sleep(delay)
-    raise RuntimeError("Wikimedia API remained rate-limited after retries")
 
-def list_category_files(session: requests.Session) -> list[str]:
-    titles: list[str] = []
-    cont: dict[str, str] = {}
-    while True:
-        params = {
-            "action": "query",
-            "format": "json",
-            "list": "categorymembers",
-            "cmtitle": CATEGORY,
-            "cmnamespace": "6",
-            "cmtype": "file",
-            "cmlimit": 500,
-            "maxlag": 5,
-            **cont,
-        }
-        data = get_json(session, params)
-        titles.extend(item["title"] for item in data.get("query", {}).get("categorymembers", []))
-        if "continue" not in data:
-            break
-        time.sleep(2.5)
-        cont = {
-            "cmcontinue": data["continue"]["cmcontinue"],
-            "continue": data["continue"]["continue"],
-        }
-    return titles
+def dataset_path() -> Path:
+    cache_dir = Path(os.environ.get("AUDIO_CACHE_DIR", "/tmp/indonesian-engineer-audio-cache"))
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    return cache_dir / "Q305-ind-Indonesian.zip"
 
-def transcription_candidates_from_title(title: str) -> list[str]:
-    name = unquote(title.removeprefix("File:"))
-    prefix = "LL-Q9240 (ind)-"
-    if not name.startswith(prefix) or not name.lower().endswith(".wav"):
-        return []
-    body = name[len(prefix):-4]
-    parts = body.split("-")
-    candidates = []
-    for index in range(1, len(parts) + 1):
-        candidate = "-".join(parts[index - 1:])
-        if candidate:
-            candidates.append(candidate)
-    return candidates
 
-def choose_matches(all_titles: list[str], desired: list[str]) -> dict[str, str]:
-    wanted = {normalize(text): text for text in desired}
-    found: dict[str, str] = {}
-    for title in all_titles:
-        if not title.lower().endswith(".wav"):
-            continue
-        for transcription in transcription_candidates_from_title(title):
-            key = normalize(transcription)
-            if key in wanted and key not in found:
-                found[key] = title
-                break
-    return found
+def download_dataset(path: Path) -> None:
+    if path.exists() and path.stat().st_size > 1_000_000:
+        return
 
-def metadata_for_titles(session: requests.Session, titles: list[str]) -> dict[str, dict]:
-    result: dict[str, dict] = {}
-    for start in range(0, len(titles), 50):
-        batch = titles[start:start + 50]
-        data = get_json(session, {
-            "action": "query",
-            "format": "json",
-            "prop": "imageinfo",
-            "iiprop": "url|extmetadata",
-            "titles": "|".join(batch),
-            "maxlag": 5,
-        })
-        for page in data.get("query", {}).get("pages", {}).values():
-            title = page.get("title")
-            info = (page.get("imageinfo") or [{}])[0]
-            meta = info.get("extmetadata") or {}
-            license_name = (meta.get("LicenseShortName") or {}).get("value", "")
-            clean_license = re.sub(r"<[^>]+>", "", license_name).upper()
-            if "CC0" in clean_license or "CC-ZERO" in clean_license:
-                result[title] = {
-                    "url": info.get("url", ""),
-                    "license": license_name,
-                    "description": (meta.get("ImageDescription") or {}).get("value", ""),
-                }
-    return result
-
-def download_file(session: requests.Session, url: str, out: Path) -> None:
-    cache_dir = Path(os.environ.get("AUDIO_CACHE_DIR", ""))
-    if str(cache_dir):
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cache_file = cache_dir / (hashlib.sha256(url.encode("utf-8")).hexdigest() + ".wav")
-        if cache_file.exists():
-            shutil.copy2(cache_file, out)
-            return
-    with session.get(url, timeout=120, stream=True) as response:
+    tmp = path.with_suffix(".part")
+    session = requests.Session()
+    session.headers["User-Agent"] = UA
+    with session.get(DATASET_URL, timeout=300, stream=True) as response:
         response.raise_for_status()
-        with out.open("wb") as f:
+        with tmp.open("wb") as out:
             for chunk in response.iter_content(1024 * 256):
                 if chunk:
-                    f.write(chunk)
-    if str(cache_dir):
-        shutil.copy2(out, cache_file)
+                    out.write(chunk)
+    tmp.replace(path)
+
+
+def transcription_candidates(filename: str) -> list[str]:
+    name = unquote(Path(filename).name)
+    stem = Path(name).stem
+    prefix = "LL-Q9240 (ind)-"
+    if not stem.startswith(prefix):
+        return []
+
+    body = stem[len(prefix):]
+    parts = body.split("-")
+    candidates: list[str] = []
+
+    # Exact body first, then progressively remove recorder/speaker prefixes.
+    candidates.append(body)
+    for index in range(1, len(parts)):
+        candidates.append("-".join(parts[index:]))
+
+    # Archive builders may normalize spaces to underscores.
+    result = []
+    for candidate in candidates:
+        result.append(candidate)
+        result.append(candidate.replace("_", " "))
+    return result
+
+
+def find_audio_files(root: Path, desired: list[str]) -> dict[str, Path]:
+    wanted = {normalize(text): text for text in desired}
+    found: dict[str, Path] = {}
+
+    for path in root.rglob("*"):
+        if not path.is_file() or path.suffix.lower() not in {".wav", ".ogg", ".mp3"}:
+            continue
+
+        for candidate in transcription_candidates(path.name):
+            key = normalize(candidate)
+            if key in wanted and key not in found:
+                found[key] = path
+                break
+
+    return found
+
 
 def duration_ms(path: Path) -> int:
     result = subprocess.run(
-        ["ffprobe", "-v", "error", "-show_entries", "format=duration",
-         "-of", "default=noprint_wrappers=1:nokey=1", str(path)],
+        [
+            "ffprobe", "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(path),
+        ],
         capture_output=True, text=True, check=True,
     )
     return max(1, int(float(result.stdout.strip()) * 1000))
+
 
 def sha256_file(path: Path) -> str:
     h = hashlib.sha256()
@@ -172,53 +136,54 @@ def sha256_file(path: Path) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+
 def main() -> None:
     ASSETS.mkdir(parents=True, exist_ok=True)
-    for path in (ASSETS / "tts_audio.m4a", ASSETS / "tts_index.tsv"):
-        path.unlink(missing_ok=True)
-
-    session = requests.Session()
-    session.headers["User-Agent"] = UA
+    audio_output = ASSETS / "tts_audio.m4a"
+    index_output = ASSETS / "tts_index.tsv"
+    audio_output.unlink(missing_ok=True)
+    index_output.unlink(missing_ok=True)
 
     desired = desired_texts()
-    all_titles = list_category_files(session)
-    matches = choose_matches(all_titles, desired)
-    print("CATEGORY_FILES =", len(all_titles))
-    print("EXACT_MATCHES =", len(matches))
-    meta = metadata_for_titles(session, list(matches.values()))
-    print("CC0_MATCHES =", len(meta))
+    archive = dataset_path()
+    download_dataset(archive)
 
-    selected = []
-    for key, title in matches.items():
-        if title not in meta:
-            continue
-        selected.append((meta[title]["url"], desired[[normalize(x) for x in desired].index(key)], title, meta[title]))
-        if len(selected) >= MAX_AUDIO:
-            break
+    with tempfile.TemporaryDirectory(prefix="lingualibre-ind-") as tmp:
+        extracted = Path(tmp) / "dataset"
+        extracted.mkdir()
+        with zipfile.ZipFile(archive) as zf:
+            zf.extractall(extracted)
 
-    if not selected:
-        print("No CC0 exact matches found; keeping audio index empty")
-        (ASSETS / "tts_index.tsv").write_text(
-            "sha256\tstart_ms\tduration_ms\toriginal_text\tsource_file\tlicense\n",
-            encoding="utf-8",
-        )
-        return
+        matches = find_audio_files(extracted, desired)
+        print("GENERATED_TEXTS =", len(desired))
+        print("DATASET_ARCHIVE_BYTES =", archive.stat().st_size)
+        print("EXACT_MATCHES =", len(matches))
 
-    with tempfile.TemporaryDirectory(prefix="indonesian-audio-") as tmp:
-        tmpdir = Path(tmp)
+        if not matches:
+            index_output.write_text(
+                "sha256\tstart_ms\tduration_ms\toriginal_text\tsource_file\tlicense\n",
+                encoding="utf-8",
+            )
+            raise SystemExit("No exact Lingua Libre matches found")
+
+        selected = []
+        wanted_by_key = {normalize(text): text for text in desired}
+        for key, source in matches.items():
+            selected.append((wanted_by_key[key], source))
+            if len(selected) >= MAX_AUDIO:
+                break
+
         normalized_files: list[Path] = []
         index_rows = []
         cursor_ms = 0
 
-        for n, (url, text, source_title, license_meta) in enumerate(selected):
-            raw = tmpdir / f"{n:04d}.wav"
-            normalized = tmpdir / f"{n:04d}_norm.wav"
-            download_file(session, url, raw)
+        for number, (text, source) in enumerate(selected):
+            normalized = Path(tmp) / f"{number:04d}_norm.wav"
 
             subprocess.run(
                 [
                     "ffmpeg", "-y", "-loglevel", "error",
-                    "-i", str(raw),
+                    "-i", str(source),
                     "-ac", "1", "-ar", "24000",
                     "-af", "apad=pad_dur=0.12",
                     str(normalized),
@@ -226,18 +191,25 @@ def main() -> None:
                 check=True,
             )
 
-            dur = duration_ms(normalized)
+            duration = duration_ms(normalized)
             key = hashlib.sha256(text.encode("utf-8")).hexdigest()
             normalized_files.append(normalized)
             index_rows.append([
-                key, cursor_ms, dur, text, source_title, license_meta["license"]
+                key,
+                cursor_ms,
+                duration,
+                text,
+                source.name,
+                "CC0 / Lingua Libre pronunciation dataset; verify individual source page",
             ])
-            cursor_ms += dur
+            cursor_ms += duration
 
-        concat = tmpdir / "concat.txt"
+        concat = Path(tmp) / "concat.txt"
         concat.write_text(
-            "".join(f"file '{p.as_posix().replace(chr(39), chr(39)+chr(92)+chr(39)+chr(39))}'\n"
-                    for p in normalized_files),
+            "".join(
+                "file '" + str(path).replace("'", "'\\''") + "'\n"
+                for path in normalized_files
+            ),
             encoding="utf-8",
         )
 
@@ -248,19 +220,23 @@ def main() -> None:
                 "-i", str(concat),
                 "-c:a", "aac", "-b:a", "96k",
                 "-ar", "24000", "-ac", "1",
-                str(ASSETS / "tts_audio.m4a"),
+                str(audio_output),
             ],
             check=True,
         )
 
-        with (ASSETS / "tts_index.tsv").open("w", encoding="utf-8", newline="") as f:
+        with index_output.open("w", encoding="utf-8", newline="") as f:
             writer = csv.writer(f, delimiter="\t", lineterminator="\n")
-            writer.writerow(["sha256","start_ms","duration_ms","original_text","source_file","license"])
+            writer.writerow([
+                "sha256", "start_ms", "duration_ms",
+                "original_text", "source_file", "license",
+            ])
             writer.writerows(index_rows)
 
-        print("GENERATED_TEXTS =", len(desired))
         print("INDEXED_AUDIO =", len(index_rows))
-        print("AUDIO_FILE_SHA256 =", sha256_file(ASSETS / "tts_audio.m4a"))
+        print("MISSING_AUDIO =", len(desired) - len(index_rows))
+        print("AUDIO_FILE_SHA256 =", sha256_file(audio_output))
+
 
 if __name__ == "__main__":
     main()
