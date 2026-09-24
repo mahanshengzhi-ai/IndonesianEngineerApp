@@ -1,11 +1,71 @@
-id	title	description	speaker_a	speaker_b
-SC01	第一次到工地	报到、认识现场人员、确认工作区域	Selamat pagi. Saya dari tim teknik.	Selamat pagi. Silakan ikut saya.
-SC02	材料进场	确认材料数量、型号与卸货位置	Materialnya sudah datang?	Sudah. Tolong cek jumlah dan ukurannya.
-SC03	图纸确认	和同事确认图纸版本与尺寸	Kita pakai gambar revisi yang mana?	Gunakan revisi terbaru ini.
-SC04	安全交底	进入施工区域前进行基本安全提醒	Hati-hati. Pakai helm dan sepatu keselamatan.	Baik, saya mengerti.
-SC05	混凝土浇筑	浇筑开始前确认配合和检查事项	Betonnya siap dicor?	Sudah siap. Kita mulai setelah pemeriksaan.
-SC06	测量放样	确认基准点和放样位置	Titik referensinya di mana?	Di sana. Tolong cek kembali koordinatnya.
-SC07	餐厅	点餐和确认饮料	Mau makan apa?	Saya mau nasi dan air putih.
-SC08	打车	说明目的地和确认价格	Tolong antar saya ke hotel ini.	Baik, Pak. Kita berangkat sekarang.
-SC09	问路	确认方向和距离	Permisi, stasiun di mana?	Lurus, lalu belok kiri.
-SC10	日报 / 会议	汇报今天完成的工作	Apa yang kita selesaikan hari ini?	Kita menyelesaikan pekerjaan fondasi.
+scene_id	title	description	turn	speaker	indonesian	chinese
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	1	A	Selamat pagi. Saya dari tim teknik.	早上好。我来自技术团队。
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	2	B	Selamat pagi. Silakan ikut saya.	早上好。请跟我来。
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	3	A	Area kerja kita di sebelah mana?	我们的工作区域在哪一边？
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	4	B	Di sebelah gedung utama, dekat gudang material.	在主楼旁边，靠近材料仓库。
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	5	A	Apakah saya perlu memakai alat pelindung lengkap?	我需要佩戴完整的防护用品吗？
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	6	B	Ya, pakai helm, rompi, dan sepatu keselamatan.	需要，请戴安全帽、穿反光背心和安全鞋。
+SC01	第一次到工地	第一次到工地报到、认识现场人员并确认工作区域	7	A	Baik, saya mengerti.	好的，我明白了。
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	1	A	Materialnya sudah datang?	材料已经到了吗？
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	2	B	Sudah. Ada tiga truk di depan gudang.	到了，仓库前面有三辆卡车。
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	3	A	Berapa jumlah material yang datang?	到场材料有多少？
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	4	B	Jumlahnya sesuai surat pengiriman.	数量与送货单一致。
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	5	A	Mari kita cek spesifikasinya bersama.	我们一起检查规格吧。
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	6	B	Baik. Setelah itu material bisa dipindahkan.	好的。之后就可以搬运材料了。
+SC02	材料进场	确认到场材料的数量、规格和卸货位置	7	A	Tolong catat hasil pemeriksaan.	请记录检查结果。
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	1	A	Kita pakai gambar revisi yang mana?	我们使用哪个版本的图纸？
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	2	B	Gunakan revisi terbaru ini.	使用这个最新版本。
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	3	A	Apa ada perubahan pada ukuran kolom?	柱子的尺寸有修改吗？
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	4	B	Ya, ukuran kolom di lantai dua berubah.	有，二层柱子的尺寸改了。
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	5	A	Tolong tunjukkan bagian yang berubah.	请指出修改的部分。
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	6	B	Bagian ini. Perubahan sudah diberi tanda.	这一部分，修改处已经标记了。
+SC03	图纸确认	确认正在使用的图纸版本、尺寸和修改内容	7	A	Baik, saya akan periksa lagi.	好的，我再检查一遍。
+SC04	安全交底	进入施工区域前确认基本安全要求	1	A	Sebelum masuk, apa yang harus saya perhatikan?	进入前我需要注意什么？
+SC04	安全交底	进入施工区域前确认基本安全要求	2	B	Jangan masuk ke area yang diberi tanda merah.	不要进入标红的区域。
+SC04	安全交底	进入施工区域前确认基本安全要求	3	A	Apakah pekerjaan di atas masih berlangsung?	上方还在施工吗？
+SC04	安全交底	进入施工区域前确认基本安全要求	4	B	Ya, jadi gunakan jalur ini.	是的，所以请走这条通道。
+SC04	安全交底	进入施工区域前确认基本安全要求	5	A	Saya harus memakai helm dan sepatu keselamatan.	我需要佩戴安全帽和安全鞋。
+SC04	安全交底	进入施工区域前确认基本安全要求	6	B	Benar. Hati-hati saat melewati area kerja.	对，通过施工区域时要小心。
+SC04	安全交底	进入施工区域前确认基本安全要求	7	A	Baik, saya akan berhati-hati.	好的，我会注意安全。
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	1	A	Betonnya sudah siap dicor?	混凝土准备好浇筑了吗？
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	2	B	Sudah. Pompa beton juga sudah siap.	准备好了，混凝土泵也准备好了。
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	3	A	Apakah hasil pemeriksaan sudah lengkap?	检查结果都完成了吗？
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	4	B	Sudah, semuanya sesuai.	完成了，都符合要求。
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	5	A	Kita mulai dari bagian mana?	我们从哪一部分开始？
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	6	B	Mulai dari sisi kiri lalu lanjut ke tengah.	从左侧开始，然后向中间推进。
+SC05	混凝土浇筑	浇筑开始前确认混凝土、设备和检查事项	7	A	Baik, kita mulai setelah semua siap.	好的，全部准备好后开始。
+SC06	测量放样	确认基准点、坐标和放样位置	1	A	Titik referensinya di mana?	基准点在哪里？
+SC06	测量放样	确认基准点、坐标和放样位置	2	B	Titik referensi ada di dekat pagar.	基准点在围栏附近。
+SC06	测量放样	确认基准点、坐标和放样位置	3	A	Apakah koordinatnya sudah diperiksa?	坐标已经检查了吗？
+SC06	测量放样	确认基准点、坐标和放样位置	4	B	Sudah. Ini hasil pengukurannya.	已经检查了，这是测量结果。
+SC06	测量放样	确认基准点、坐标和放样位置	5	A	Tolong cek elevasi titik ini sekali lagi.	请再检查一下这个点的高程。
+SC06	测量放样	确认基准点、坐标和放样位置	6	B	Baik, saya ukur ulang sekarang.	好的，我现在重新测量。
+SC06	测量放样	确认基准点、坐标和放样位置	7	A	Setelah itu kita lanjut ke titik berikutnya.	之后我们继续下一个点。
+SC07	餐厅	在餐厅点餐、确认饮料和结账	1	A	Selamat siang. Mau makan apa?	中午好。您想吃什么？
+SC07	餐厅	在餐厅点餐、确认饮料和结账	2	B	Saya mau nasi dan ayam.	我要米饭和鸡肉。
+SC07	餐厅	在餐厅点餐、确认饮料和结账	3	A	Mau minum apa?	您喝什么？
+SC07	餐厅	在餐厅点餐、确认饮料和结账	4	B	Air putih saja, terima kasih.	白水就可以，谢谢。
+SC07	餐厅	在餐厅点餐、确认饮料和结账	5	A	Pedas atau tidak?	要辣的吗？
+SC07	餐厅	在餐厅点餐、确认饮料和结账	6	B	Tidak terlalu pedas.	不要太辣。
+SC07	餐厅	在餐厅点餐、确认饮料和结账	7	A	Baik, silakan tunggu sebentar.	好的，请稍等。
+SC08	打车	向司机说明目的地、确认路线和费用	1	A	Tolong antar saya ke hotel ini.	请送我去这家酒店。
+SC08	打车	向司机说明目的地、确认路线和费用	2	B	Baik, Pak. Kita berangkat sekarang.	好的先生，我们现在出发。
+SC08	打车	向司机说明目的地、确认路线和费用	3	A	Berapa lama perjalanan dari sini?	从这里过去要多久？
+SC08	打车	向司机说明目的地、确认路线和费用	4	B	Sekitar tiga puluh menit kalau jalan lancar.	路况顺利的话大约三十分钟。
+SC08	打车	向司机说明目的地、确认路线和费用	5	A	Baik. Tolong beri tahu kalau sudah dekat.	好的，快到了请告诉我。
+SC08	打车	向司机说明目的地、确认路线和费用	6	B	Siap. Kita akan lewat jalan utama.	好的，我们走主路。
+SC08	打车	向司机说明目的地、确认路线和费用	7	A	Terima kasih.	谢谢。
+SC09	问路	询问方向、确认地标和步行路线	1	A	Permisi, stasiun di mana?	不好意思，请问车站在哪里？
+SC09	问路	询问方向、确认地标和步行路线	2	B	Lurus, lalu belok kiri di persimpangan.	直走，然后在路口左转。
+SC09	问路	询问方向、确认地标和步行路线	3	A	Jauh dari sini?	离这里远吗？
+SC09	问路	询问方向、确认地标和步行路线	4	B	Tidak terlalu jauh, sekitar sepuluh menit.	不太远，大约十分钟。
+SC09	问路	询问方向、确认地标和步行路线	5	A	Apakah ada gedung besar sebagai tanda?	路上有明显的大楼作标志吗？
+SC09	问路	询问方向、确认地标和步行路线	6	B	Ada. Stasiun ada di sebelah gedung itu.	有，车站就在那栋楼旁边。
+SC09	问路	询问方向、确认地标和步行路线	7	A	Baik, terima kasih.	好的，谢谢。
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	1	A	Apa yang kita selesaikan hari ini?	我们今天完成了什么？
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	2	B	Kita menyelesaikan pekerjaan fondasi.	我们完成了基础施工。
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	3	A	Apakah ada masalah di lapangan?	现场有问题吗？
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	4	B	Ada satu bagian yang perlu diperbaiki.	有一部分需要整改。
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	5	A	Kapan perbaikannya bisa selesai?	什么时候可以完成整改？
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	6	B	Kami targetkan selesai besok pagi.	我们计划明天上午完成。
+SC10	日报 / 会议	在短会中汇报当天完成、问题和下一步工作	7	A	Baik. Tolong masukkan ke laporan harian.	好的，请把它写进日报。
