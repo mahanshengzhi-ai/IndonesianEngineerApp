@@ -41,6 +41,8 @@ jobs:
           key: indonesian-audio-v1-${{ hashFiles('app/src/main/assets/words_*.tsv', 'app/src/main/assets/sentences.tsv', 'app/src/main/assets/scenes.tsv', 'app/src/main/assets/letters.tsv') }}
 
       - name: Prepare CC0 Indonesian audio
+        continue-on-error: true
+        timeout-minutes: 3
         run: AUDIO_CACHE_DIR=/tmp/indonesian-engineer-audio-cache python3 scripts/prepare_wikimedia_audio.py
 
       - name: Validate content and forbidden APIs
