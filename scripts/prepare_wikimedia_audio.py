@@ -19,7 +19,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app" / "src" / "main" / "assets"
 CATEGORY = "Category:Lingua Libre pronunciation-ind"
 API = "https://commons.wikimedia.org/w/api.php"
-UA = "IndonesianEngineerApp/0.1 (open-source audio build)"
+UA = "IndonesianEngineerApp/0.2 (open-source audio build; contact: mahanshengzhi-ai)"
 MAX_AUDIO = 300
 
 def normalize(text: str) -> str:
@@ -72,26 +72,34 @@ def list_category_files(session: requests.Session) -> list[str]:
             "cmtitle": CATEGORY,
             "cmnamespace": "6",
             "cmtype": "file",
-            "cmlimit": 200,
+            "cmlimit": 500,
+            "maxlag": 5,
             **cont,
         }
         data = get_json(session, params)
         titles.extend(item["title"] for item in data.get("query", {}).get("categorymembers", []))
         if "continue" not in data:
             break
-        time.sleep(1.5)
+        time.sleep(2.5)
         cont = {
             "cmcontinue": data["continue"]["cmcontinue"],
             "continue": data["continue"]["continue"],
         }
     return titles
 
-def transcription_from_title(title: str) -> str:
-    name = title.removeprefix("File:")
-    match = re.match(r"^.+?-(.+)\.wav$", name, re.IGNORECASE)
-    if not match:
-        return ""
-    return unquote(match.group(1))
+def transcription_candidates_from_title(title: str) -> list[str]:
+    name = unquote(title.removeprefix("File:"))
+    prefix = "LL-Q9240 (ind)-"
+    if not name.startswith(prefix) or not name.lower().endswith(".wav"):
+        return []
+    body = name[len(prefix):-4]
+    parts = body.split("-")
+    candidates = []
+    for index in range(1, len(parts) + 1):
+        candidate = "-".join(parts[index - 1:])
+        if candidate:
+            candidates.append(candidate)
+    return candidates
 
 def choose_matches(all_titles: list[str], desired: list[str]) -> dict[str, str]:
     wanted = {normalize(text): text for text in desired}
@@ -99,10 +107,11 @@ def choose_matches(all_titles: list[str], desired: list[str]) -> dict[str, str]:
     for title in all_titles:
         if not title.lower().endswith(".wav"):
             continue
-        transcription = transcription_from_title(title)
-        key = normalize(transcription)
-        if key in wanted and key not in found:
-            found[key] = title
+        for transcription in transcription_candidates_from_title(title):
+            key = normalize(transcription)
+            if key in wanted and key not in found:
+                found[key] = title
+                break
     return found
 
 def metadata_for_titles(session: requests.Session, titles: list[str]) -> dict[str, dict]:
@@ -115,13 +124,15 @@ def metadata_for_titles(session: requests.Session, titles: list[str]) -> dict[st
             "prop": "imageinfo",
             "iiprop": "url|extmetadata",
             "titles": "|".join(batch),
+            "maxlag": 5,
         })
         for page in data.get("query", {}).get("pages", {}).values():
             title = page.get("title")
             info = (page.get("imageinfo") or [{}])[0]
             meta = info.get("extmetadata") or {}
             license_name = (meta.get("LicenseShortName") or {}).get("value", "")
-            if "CC0" in re.sub(r"<[^>]+>", "", license_name).upper():
+            clean_license = re.sub(r"<[^>]+>", "", license_name).upper()
+            if "CC0" in clean_license or "CC-ZERO" in clean_license:
                 result[title] = {
                     "url": info.get("url", ""),
                     "license": license_name,
@@ -172,7 +183,10 @@ def main() -> None:
     desired = desired_texts()
     all_titles = list_category_files(session)
     matches = choose_matches(all_titles, desired)
+    print("CATEGORY_FILES =", len(all_titles))
+    print("EXACT_MATCHES =", len(matches))
     meta = metadata_for_titles(session, list(matches.values()))
+    print("CC0_MATCHES =", len(meta))
 
     selected = []
     for key, title in matches.items():
