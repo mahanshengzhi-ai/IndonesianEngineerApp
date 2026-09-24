@@ -5,6 +5,7 @@ import argparse
 import csv
 import hashlib
 import re
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,6 +95,11 @@ def main():
     print(f"LETTER_COUNT = {len(letters)}")
 
     word_ids = [r["id"] for r in words if r.get("id")]
+    mixed_language_rows = [
+        r["id"] for r in words
+        if re.search(r"[\u3400-\u9fff]", r.get("indonesian", ""))
+    ]
+    print(f"CHINESE_CHARACTERS_IN_INDONESIAN = {len(mixed_language_rows)}")
     indonesian_keys = [r["indonesian"].strip() for r in words if r.get("indonesian")]
     duplicate_word_ids = len(word_ids) - len(set(word_ids))
     duplicate_audio_words = len(indonesian_keys) - len(set(indonesian_keys))
@@ -147,6 +153,8 @@ def main():
 
     problems: list[str] = []
 
+    if mixed_language_rows:
+        problems.append(f"CHINESE_CHARACTERS_IN_INDONESIAN > 0 ({len(mixed_language_rows)})")
     if len(words) < 3020:
         problems.append(f"VOCABULARY_COUNT < 3020 ({len(words)})")
     if len(sentences) != 40:
