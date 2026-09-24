@@ -431,12 +431,15 @@ def main() -> int:
 
     exact_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     supplemental_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    accepted_cc0_files = 0
 
     for item in files:
         metadata = item.get("metadata", {})
-        license_name = metadata_value(metadata, "LicenseShortName")
-        if license_name not in CC0_NAMES:
+        license_name = metadata_value(metadata, "LicenseShortName").casefold()
+        compact_license = license_name.replace(" ", "").replace("-", "")
+        if "cc0" not in compact_license and "cczero" not in compact_license:
             continue
+        accepted_cc0_files += 1
 
         title = item["title"]
         parsed = title_transcription_candidates(title)
@@ -478,6 +481,7 @@ def main() -> int:
         used_keys.add(key)
 
     exact_learning_matches = len(selected)
+    print("Accepted CC0/CC-Zero WAV files:", accepted_cc0_files)
     print("Exact learning-text audio matches:", exact_learning_matches)
 
     for key in sorted(supplemental_candidates):
@@ -500,6 +504,7 @@ def main() -> int:
             "audio_lines": len(selected),
             "minimum_audio_lines": args.min_lines,
             "candidate_category_files": len(files),
+            "accepted_cc0_files": accepted_cc0_files,
             "message": "Not enough current CC0 Indonesian recordings to reach the audio floor.",
         }
         path = root / "build" / "audio" / "audio_build_report.json"
@@ -531,6 +536,7 @@ def main() -> int:
         "status": "PASS",
         "source": "Wikimedia Commons / Lingua Libre pronunciation-ind",
         "source_category_files": len(files),
+        "accepted_cc0_files": accepted_cc0_files,
         "required_learning_texts": len(required_texts),
         "exact_learning_audio_matches": exact_learning_matches,
         "learning_audio_coverage_pct": round(
