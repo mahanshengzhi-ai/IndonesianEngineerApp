@@ -1,54 +1,42 @@
 # 印尼语语音构建说明
 
-本项目运行时绝不使用 TTS、SpeechRecognizer、麦克风或神经网络语音模型。
+本项目运行时不使用 TTS、SpeechRecognizer、麦克风或神经网络语音模型。
 
-当前 APK 使用：
-- 构建阶段生成印尼语学习音频
-- Microsoft Edge TTS 的印尼语神经声线 id-ID-ArdiNeural
-- 构建阶段速率约为 -12%
+当前音频架构：
+- 构建阶段从 Wikimedia Commons 的 Lingua Libre 印尼语发音录音中筛选可再分发的真人录音
+- 优先使用与学习文本完全一致的真人录音
+- 没有整句录音时，只把许可允许再分发的真人“单词录音”做离线拼接
+- 不使用任何 TTS 生成，不在用户手机上生成语音
 - 输出统一为 24kHz / Mono / AAC M4A
-- APK 运行时只通过 Media3 ExoPlayer 播放已经打包好的音频
+- APK 运行时仅通过 Media3 ExoPlayer 播放已经打包的音频片段
+- tts_index.tsv 使用学习原文 SHA-256 作为查找键
+- AUDIO_ATTRIBUTION.tsv 随音频一起生成，记录来源、作者、许可证和来源页
 
-当前索引：
-- 原始学习文本 SHA-256
-- start_ms
-- duration_ms
-- original_text
-- source_file
-- 资源来源标记
+许可证筛选：
+- 允许：CC0、Public Domain、CC BY 2.0/3.0/4.0、CC BY-SA 2.0/3.0/4.0
+- 排除：CC BY-NC、CC BY-ND 及包含非商业/禁止改编限制的许可证
+- APK 不打包无法核验许可证的录音
 
 重要：
-- 当前这些构建阶段生成的语音没有在项目内标记为第三方授权真人录音
-- 不把它们统计成已核验许可证音频
+- 音频覆盖率不强行补齐到 100%
+- 没有对应真实录音时，界面不显示假的“播放”按钮，而显示“暂无内置语音”或直接隐藏
 - 用户手机上不会联网生成语音
 - 用户手机上不会加载 TTS 模型
 - 没有 RECORD_AUDIO 权限
 - 没有 SpeechRecognizer / RecognizerIntent
 - 没有 ONNX / sherpa-onnx / eSpeak Runtime
 
-阶段 1 最终审计结果：
+当前内容基准：
+- 3600 个工程/现场相关词汇
+- 40 个核心句型
+- 10 个真实场景
+- 70 条场景对话行
+- 26 个字母发音条目
 
-VOCABULARY_COUNT = 3574
-SENTENCE_COUNT = 40
-SCENE_COUNT = 10
-SCENE_LINE_COUNT = 70
-LETTER_COUNT = 26
-
-TOTAL_AUDIO_TEXTS = 3704
-REAL_AUDIO = 3704
-MISSING_AUDIO = 0
-INDEXED_AUDIO = 3704
-DUPLICATE_AUDIO_KEYS = 0
-LICENSED_AUDIO = 0
-
-AUDIO FORMAT:
-codec = AAC
-sample_rate = 24000
-channels = 1
-
-最新阶段 1 CI：
-run = 43
-head_sha = a5aa4c87c106457ec3f7b6b318119802ed208452
-conclusion = success
-debug APK artifact = IndonesianEngineer-debug
-artifact SHA-256 = 5137530add11e6556ab09f91845b3296c76a93f079e60342545bfc79d895d38a
+最终 Release 构建要求：
+1. 内容校验通过
+2. 禁止 API 扫描为 0
+3. Release APK 构建成功
+4. APK 签名校验通过
+5. APK 16KB 对齐校验通过
+6. 音频只包含真实、可核验、可再分发来源的录音
