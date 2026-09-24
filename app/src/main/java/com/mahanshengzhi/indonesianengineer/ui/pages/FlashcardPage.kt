@@ -102,8 +102,15 @@ class FlashcardPage(
             )
         }
 
-        val listen = UiKit.secondaryButton(activity, "听发音")
-        listen.setOnClickListener { activity.playAudio(item.indonesian) }
+        val hasAudio = activity.hasAudio(item.indonesian)
+        val listen = UiKit.secondaryButton(
+            activity,
+            if (hasAudio) "听发音" else "暂无内置语音"
+        )
+        listen.isEnabled = hasAudio
+        listen.setOnClickListener {
+            if (hasAudio) activity.playAudio(item.indonesian)
+        }
         content.addView(listen)
 
         if (!revealed) {
