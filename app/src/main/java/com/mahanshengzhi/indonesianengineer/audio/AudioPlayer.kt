@@ -3,6 +3,7 @@ package com.mahanshengzhi.indonesianengineer.audio
 import android.content.Context
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
+import androidx.media3.common.PlaybackParameters
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.ExoPlayer
 
@@ -16,7 +17,10 @@ class AudioPlayer(context: Context) {
 
     fun play(text: String): Boolean {
         val segment = index.find(text) ?: return false
-        if (runCatching { appContext.assets.openFd("tts_audio.m4a") }.isFailure) return false
+        val exists = runCatching {
+            appContext.assets.open("tts_audio.m4a").use { }
+        }.isSuccess
+        if (!exists) return false
 
         val item = MediaItem.Builder()
             .setUri("asset:///tts_audio.m4a")
@@ -38,7 +42,13 @@ class AudioPlayer(context: Context) {
         return true
     }
 
-    fun pause() { player?.pause() }
+    fun pause() {
+        player?.pause()
+    }
+
+    fun setSpeed(speed: Float) {
+        player?.playbackParameters = PlaybackParameters(speed.coerceIn(0.8f, 1.0f))
+    }
 
     fun release() {
         player?.release()
