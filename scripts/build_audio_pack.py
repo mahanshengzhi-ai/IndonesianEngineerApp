@@ -15,8 +15,10 @@ No TTS or synthetic audio is generated.
 from __future__ import annotations
 
 import argparse
+import audioop
 import csv
 import hashlib
+import io
 import json
 import re
 import shutil
@@ -27,6 +29,8 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib.error
 import urllib.parse
 import urllib.request
+import wave
+import zipfile
 import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -39,6 +43,7 @@ USER_AGENT = "IndonesianEngineerApp/0.7 audio-builder"
 PAUSE_MS = 120
 TARGET_LINES = 3000
 MAX_LINES = 3200
+DATASET_URL = "https://lingualibre.org/datasets/Q305-ind-Indonesian.zip"
 
 
 def request_json(params: dict[str, Any], retries: int = 8) -> dict[str, Any]:
@@ -255,104 +260,136 @@ def write_index(path: Path, rows: list[dict[str, Any]]) -> None:
             ])
 
 
+def download_dataset_zip(cache_root: Path) -> Path:
+    destination = cache_root / "Q305-ind-Indonesian.zip"
+    if destination.exists() and destination.stat().st_size > 0:
+        return destination
+
+    print("Downloading Lingua Libre Indonesian dataset:", DATASET_URL)
+    download_file(DATASET_URL, destination)
+    return destination
+
+
+def build_zip_name_map(dataset_zip: zipfile.ZipFile) -> dict[str, str]:
+    result: dict[str, str] = {}
+    for member in dataset_zip.namelist():
+        if not member.lower().endswith(".wav"):
+            continue
+        name = member.rsplit("/", 1)[-1]
+        result[name] = member
+    return result
+
+
+def normalize_wav_bytes(raw: bytes) -> tuple[bytes, int]:
+    with wave.open(io.BytesIO(raw), "rb") as wav:
+        channels = wav.getnchannels()
+        sample_width = wav.getsampwidth()
+        sample_rate = wav.getframerate()
+        frames = wav.readframes(wav.getnframes())
+
+    if channels == 2:
+        frames = audioop.tomono(frames, sample_width, 0.5, 0.5)
+        channels = 1
+    elif channels != 1:
+        raise ValueError(f"Unsupported channel count: {channels}")
+
+    if sample_width != 2:
+        frames = audioop.lin2lin(frames, sample_width, 2)
+        sample_width = 2
+
+    if sample_rate != 24000:
+        frames, _ = audioop.ratecv(
+            frames,
+            sample_width,
+            1,
+            sample_rate,
+            24000,
+            None,
+        )
+        sample_rate = 24000
+
+    duration_ms = max(
+        1,
+        round(len(frames) * 1000 / (sample_width * sample_rate)),
+    )
+    return frames, duration_ms
+
+
 def make_concat_audio(
     selected: list[dict[str, Any]],
     temp_root: Path,
     output_path: Path,
+    dataset_zip: zipfile.ZipFile,
 ) -> list[dict[str, Any]]:
-    normalized_dir = temp_root / "normalized"
-    normalized_dir.mkdir(parents=True, exist_ok=True)
+    pause_frames = b"\x00\x00" * round(24000 * PAUSE_MS / 1000)
+    zip_names = build_zip_name_map(dataset_zip)
 
-    pause_file = temp_root / "pause.wav"
-    run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-f", "lavfi",
-        "-i", "anullsrc=r=24000:cl=mono",
-        "-t", f"{PAUSE_MS / 1000:.3f}",
-        "-ar", "24000",
-        "-ac", "1",
-        "-sample_fmt", "s16",
-        str(pause_file),
-    ])
-
-    jobs: list[tuple[int, dict[str, Any], Path, Path]] = []
-    for number, item in enumerate(selected, start=1):
-        jobs.append((
-            number,
-            item,
-            temp_root / f"raw_{number}.wav",
-            normalized_dir / f"{number:04d}.wav",
-        ))
+    normalized_cache: dict[int, tuple[bytes, int]] = {}
+    fallback_dir = temp_root / "fallback"
+    fallback_dir.mkdir(parents=True, exist_ok=True)
 
     def prepare(
-        job: tuple[int, dict[str, Any], Path, Path]
-    ) -> tuple[int, dict[str, Any], Path, int]:
-        number, item, raw_file, normalized_file = job
-        cache_file = Path(item["cache_path"])
-        download_file(item["url"], cache_file)
-        shutil.copy2(cache_file, raw_file)
-        run([
-            "ffmpeg", "-y", "-loglevel", "error",
-            "-i", str(raw_file),
-            "-ac", "1",
-            "-ar", "24000",
-            "-sample_fmt", "s16",
-            str(normalized_file),
-        ])
-        duration_ms = max(1, round(ffprobe_duration(normalized_file) * 1000))
-        return number, item, normalized_file, duration_ms
+        number: int,
+        item: dict[str, Any],
+    ) -> tuple[int, bytes, int]:
+        member_name = zip_names.get(item["title"])
+        if member_name:
+            with dataset_zip.open(member_name, "r") as source:
+                raw = source.read()
+        else:
+            raw_path = fallback_dir / (
+                hashlib.sha1(item["title"].encode("utf-8")).hexdigest() + ".wav"
+            )
+            download_file(item["url"], raw_path)
+            raw = raw_path.read_bytes()
 
-    prepared: dict[int, tuple[dict[str, Any], Path, int]] = {}
-    max_workers = min(6, max(2, len(jobs)))
-    with ThreadPoolExecutor(max_workers=max_workers) as executor:
-        futures = [executor.submit(prepare, job) for job in jobs]
+        frames, duration_ms = normalize_wav_bytes(raw)
+        return number, frames, duration_ms
+
+    jobs = list(enumerate(selected, start=1))
+    with ThreadPoolExecutor(max_workers=min(12, max(2, len(jobs)))) as executor:
+        futures = [
+            executor.submit(prepare, number, item)
+            for number, item in jobs
+        ]
         completed = 0
         for future in as_completed(futures):
-            number, item, normalized_file, duration_ms = future.result()
-            prepared[number] = (item, normalized_file, duration_ms)
+            number, frames, duration_ms = future.result()
+            normalized_cache[number] = (frames, duration_ms)
             completed += 1
-            if completed % 100 == 0 or completed == len(jobs):
-                print(f"Prepared audio {completed}/{len(jobs)}")
+            if completed % 250 == 0 or completed == len(jobs):
+                print(f"Normalized audio {completed}/{len(jobs)}")
 
-    concat_entries: list[Path] = []
-    rows: list[dict[str, Any]] = []
-    running_ms = 0
+    temp_pcm = temp_root / "combined.wav"
+    with wave.open(str(temp_pcm), "wb") as combined:
+        combined.setnchannels(1)
+        combined.setsampwidth(2)
+        combined.setframerate(24000)
 
-    for number in range(1, len(jobs) + 1):
-        item, normalized_file, duration_ms = prepared[number]
-        rows.append({
-            "sha256": sha256(item["target_text"]),
-            "start_ms": running_ms,
-            "duration_ms": duration_ms,
-            "original_text": item["target_text"],
-            "source_file": item["title"],
-            "source_url": item["source_url"],
-            "license": "CC0-1.0",
-        })
-        concat_entries.append(normalized_file)
-        if number != len(jobs):
-            concat_entries.append(pause_file)
-        running_ms += duration_ms + PAUSE_MS
+        rows: list[dict[str, Any]] = []
+        running_ms = 0
+        for number, item in jobs:
+            frames, duration_ms = normalized_cache[number]
+            combined.writeframes(frames)
+            rows.append({
+                "sha256": sha256(item["target_text"]),
+                "start_ms": running_ms,
+                "duration_ms": duration_ms,
+                "original_text": item["target_text"],
+                "source_file": item["title"],
+                "source_url": item["source_url"],
+                "license": "CC0-1.0",
+            })
+            running_ms += duration_ms
 
-    concat_file = temp_root / "concat.txt"
-    with concat_file.open("w", encoding="utf-8") as fh:
-        for path in concat_entries:
-            escaped = str(path).replace("'", "'\\''")
-            fh.write("file '" + escaped + "'\n")
-
-    temp_wav = temp_root / "all.wav"
-    run([
-        "ffmpeg", "-y", "-loglevel", "error",
-        "-f", "concat", "-safe", "0",
-        "-i", str(concat_file),
-        "-c:a", "pcm_s16le",
-        str(temp_wav),
-    ])
+            if number != len(jobs):
+                combined.writeframes(pause_frames)
+                running_ms += PAUSE_MS
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     run([
         "ffmpeg", "-y", "-loglevel", "error",
-        "-i", str(temp_wav),
+        "-i", str(temp_pcm),
         "-c:a", "aac",
         "-b:a", "48k",
         "-movflags", "+faststart",
@@ -463,8 +500,15 @@ def main() -> int:
     audio_path = assets / "tts_audio.m4a"
     index_path = assets / "tts_index.tsv"
 
-    with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
-        rows = make_concat_audio(selected, Path(temp_dir), audio_path)
+    dataset_zip_path = download_dataset_zip(cache_root)
+    with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
+        with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
+            rows = make_concat_audio(
+                selected,
+                Path(temp_dir),
+                audio_path,
+                dataset_zip,
+            )
 
     write_index(index_path, rows)
 
