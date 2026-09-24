@@ -332,11 +332,10 @@ def duration_ms_from_wav(path: Path) -> int:
         return max(1, round(frames * 1000 / rate))
 
 
-def make_concat_audio(
+def make_concat_audio_direct(
     selected: list[dict[str, Any]],
     temp_root: Path,
     output_path: Path,
-    dataset_zip: zipfile.ZipFile,
 ) -> list[dict[str, Any]]:
     audio_dir = temp_root / "clips"
     audio_dir.mkdir(parents=True, exist_ok=True)
@@ -348,32 +347,35 @@ def make_concat_audio(
         silence.setframerate(48000)
         silence.writeframes(b"\x00\x00" * round(48000 * PAUSE_MS / 1000))
 
-    zip_members = {}
-    for member in dataset_zip.namelist():
-        if member.lower().endswith(".wav"):
-            zip_members[Path(member).name] = member
+    jobs = list(enumerate(selected, start=1))
+    prepared: dict[int, tuple[dict[str, Any], Path, int]] = {}
+
+    def prepare(number: int, item: dict[str, Any]) -> tuple[int, dict[str, Any], Path, int]:
+        clip_path = audio_dir / f"{number:04d}.wav"
+        download_file(item["url"], clip_path)
+        duration_ms = duration_ms_from_wav(clip_path)
+        return number, item, clip_path, duration_ms
+
+    with ThreadPoolExecutor(max_workers=min(16, max(4, len(jobs)))) as executor:
+        futures = [
+            executor.submit(prepare, number, item)
+            for number, item in jobs
+        ]
+        completed = 0
+        for future in as_completed(futures):
+            number, item, clip_path, duration_ms = future.result()
+            prepared[number] = (item, clip_path, duration_ms)
+            completed += 1
+            if completed % 250 == 0 or completed == len(jobs):
+                print(f"Downloaded audio {completed}/{len(jobs)}")
 
     concat_file = temp_root / "concat.txt"
     rows = []
     running_ms = 0
-    extracted = 0
 
     with concat_file.open("w", encoding="utf-8") as playlist:
-        for number, item in enumerate(selected, start=1):
-            clip_path = audio_dir / (f"{number:04d}.wav")
-            title_without_prefix = item["title"].removeprefix("File:")
-            member_name = (
-                zip_members.get(item["title"])
-                or zip_members.get(title_without_prefix)
-            )
-
-            if member_name:
-                with dataset_zip.open(member_name, "r") as source, clip_path.open("wb") as target:
-                    shutil.copyfileobj(source, target)
-            else:
-                download_file(item["url"], clip_path)
-
-            duration_ms = duration_ms_from_wav(clip_path)
+        for number in range(1, len(jobs) + 1):
+            item, clip_path, duration_ms = prepared[number]
             rows.append({
                 "sha256": sha256(item["target_text"]),
                 "start_ms": running_ms,
@@ -384,22 +386,22 @@ def make_concat_audio(
                 "license": "CC0-1.0",
             })
 
-            escaped = str(clip_path).replace("'", "'\\''")
-            playlist.write("file '" + escaped + "'\n")
+            playlist.write(
+                "file '" + str(clip_path).replace("'", "'\\''") + "'\n"
+            )
             running_ms += duration_ms
 
-            if number != len(selected):
-                playlist.write("file '" + str(silence_path).replace("'", "'\\''") + "'\n")
+            if number != len(jobs):
+                playlist.write(
+                    "file '" + str(silence_path).replace("'", "'\\''") + "'\n"
+                )
                 running_ms += PAUSE_MS
-
-            extracted += 1
-            if extracted % 500 == 0 or extracted == len(selected):
-                print(f"Prepared audio {extracted}/{len(selected)}")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     run([
         "ffmpeg", "-y", "-loglevel", "error",
-        "-f", "concat", "-safe", "0",
+        "-f", "concat",
+        "-safe", "0",
         "-i", str(concat_file),
         "-c:a", "aac",
         "-b:a", "48k",
@@ -407,7 +409,6 @@ def make_concat_audio(
         str(output_path),
     ])
     return rows
-
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -423,120 +424,117 @@ def main() -> int:
     cache_root.mkdir(parents=True, exist_ok=True)
 
     print("Required unique learning texts:", len(required_texts))
-    dataset_zip_path = download_dataset_zip(cache_root)
+    print("Querying Wikimedia Commons category:", CATEGORY)
+    files = fetch_category_files()
+    print("Current Commons category WAV files:", len(files))
 
     exact_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     supplemental_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
-        wav_members = [
-            member for member in dataset_zip.namelist()
-            if member.lower().endswith(".wav")
-        ]
-        print("Lingua Libre dataset WAV members:", len(wav_members))
+    for item in files:
+        metadata = item.get("metadata", {})
+        license_name = metadata_value(metadata, "LicenseShortName")
+        if license_name not in CC0_NAMES:
+            continue
 
-        for member in wav_members:
-            title = Path(member).name
-            parsed = title_transcription_candidates("File:" + title)
-            if not parsed:
-                continue
+        title = item["title"]
+        parsed = title_transcription_candidates(title)
+        matched_text = None
 
-            matched_text = None
-            for candidate_text in parsed:
-                key = normalize_text(candidate_text)
-                if key in required_map:
-                    matched_text = required_map[key]
-                    break
-
-            transcript = matched_text or parsed[-1]
-            transcript_key = normalize_text(transcript)
-            if not transcript_key:
-                continue
-
-            source_url = "https://commons.wikimedia.org/wiki/File:" + urllib.parse.quote(
-                title.replace(" ", "_"), safe="/:(),"
-            )
-            candidate = {
-                "title": title,
-                "url": "",
-                "source_url": source_url,
-                "target_text": transcript,
-            }
-
-            if matched_text is not None:
-                exact_candidates[normalize_text(matched_text)].append(candidate)
-            else:
-                supplemental_candidates[transcript_key].append(candidate)
-
-        selected: list[dict[str, Any]] = []
-        used_keys: set[str] = set()
-
-        for key in sorted(exact_candidates):
-            options = sorted(exact_candidates[key], key=lambda value: value["title"])
-            selected.append(options[0])
-            used_keys.add(key)
-
-        exact_learning_matches = len(selected)
-        print("Exact learning-text audio matches:", exact_learning_matches)
-
-        for key in sorted(supplemental_candidates):
-            if len(selected) >= args.min_lines:
+        for candidate_text in parsed:
+            key = normalize_text(candidate_text)
+            if key in required_map:
+                matched_text = required_map[key]
                 break
-            if key in used_keys:
-                continue
-            options = sorted(
-                supplemental_candidates[key],
-                key=lambda value: value["title"]
-            )
-            selected.append(options[0])
-            used_keys.add(key)
 
-        if len(selected) < args.min_lines:
-            report = {
-                "status": "FAIL",
-                "required_learning_texts": len(required_texts),
-                "exact_learning_audio_matches": exact_learning_matches,
-                "audio_lines": len(selected),
-                "minimum_audio_lines": args.min_lines,
-                "dataset_wav_members": len(wav_members),
-                "message": "The official Lingua Libre Indonesian dataset did not contain enough unique recordings.",
-            }
-            path = root / "build" / "audio" / "audio_build_report.json"
-            path.parent.mkdir(parents=True, exist_ok=True)
-            path.write_text(
-                json.dumps(report, ensure_ascii=False, indent=2),
-                encoding="utf-8",
-            )
-            print(json.dumps(report, ensure_ascii=False, indent=2))
-            return 2
+        transcript = matched_text or (parsed[-1] if parsed else "")
+        transcript_key = normalize_text(transcript)
+        if not transcript_key:
+            continue
 
-        selected = selected[:args.max_lines]
+        source_url = (
+            "https://commons.wikimedia.org/wiki/"
+            + urllib.parse.quote(title.replace(" ", "_"), safe="/:(),")
+        )
+        candidate = {
+            "title": title,
+            "url": item["url"],
+            "source_url": source_url,
+            "target_text": transcript,
+        }
 
-        assets = root / "app" / "src" / "main" / "assets"
-        assets.mkdir(parents=True, exist_ok=True)
-        audio_path = assets / "tts_audio.m4a"
-        index_path = assets / "tts_index.tsv"
+        if matched_text is not None:
+            exact_candidates[normalize_text(matched_text)].append(candidate)
+        else:
+            supplemental_candidates[transcript_key].append(candidate)
 
-        with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
-            rows = make_concat_audio(
-                selected,
-                Path(temp_dir),
-                audio_path,
-                dataset_zip,
-            )
+    selected: list[dict[str, Any]] = []
+    used_keys: set[str] = set()
+
+    for key in sorted(exact_candidates):
+        options = sorted(exact_candidates[key], key=lambda value: value["title"])
+        selected.append(options[0])
+        used_keys.add(key)
+
+    exact_learning_matches = len(selected)
+    print("Exact learning-text audio matches:", exact_learning_matches)
+
+    for key in sorted(supplemental_candidates):
+        if len(selected) >= args.min_lines:
+            break
+        if key in used_keys:
+            continue
+        options = sorted(
+            supplemental_candidates[key],
+            key=lambda value: value["title"],
+        )
+        selected.append(options[0])
+        used_keys.add(key)
+
+    if len(selected) < args.min_lines:
+        report = {
+            "status": "FAIL",
+            "required_learning_texts": len(required_texts),
+            "exact_learning_audio_matches": exact_learning_matches,
+            "audio_lines": len(selected),
+            "minimum_audio_lines": args.min_lines,
+            "candidate_category_files": len(files),
+            "message": "Not enough current CC0 Indonesian recordings to reach the audio floor.",
+        }
+        path = root / "build" / "audio" / "audio_build_report.json"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            json.dumps(report, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+        print(json.dumps(report, ensure_ascii=False, indent=2))
+        return 2
+
+    selected = selected[:args.max_lines]
+
+    assets = root / "app" / "src" / "main" / "assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    audio_path = assets / "tts_audio.m4a"
+    index_path = assets / "tts_index.tsv"
+
+    with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
+        rows = make_concat_audio_direct(
+            selected,
+            Path(temp_dir),
+            audio_path,
+        )
 
     write_index(index_path, rows)
 
     report = {
         "status": "PASS",
-        "source": "Lingua Libre Indonesian dataset Q305-ind-Indonesian",
-        "source_dataset_url": DATASET_URL,
+        "source": "Wikimedia Commons / Lingua Libre pronunciation-ind",
+        "source_category_files": len(files),
         "required_learning_texts": len(required_texts),
         "exact_learning_audio_matches": exact_learning_matches,
         "learning_audio_coverage_pct": round(
             exact_learning_matches * 100 / max(1, len(required_texts)), 2
         ),
-        "dataset_wav_members": len(wav_members),
         "audio_lines": len(rows),
         "pause_ms": PAUSE_MS,
         "minimum_audio_lines": args.min_lines,
@@ -546,6 +544,7 @@ def main() -> int:
         "audio_asset_bytes": audio_path.stat().st_size,
         "index_asset_bytes": index_path.stat().st_size,
     }
+
     report_path = root / "build" / "audio" / "audio_build_report.json"
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(
