@@ -30,7 +30,6 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import wave
-import zipfile
 import unicodedata
 from collections import Counter, defaultdict
 from pathlib import Path
@@ -38,12 +37,11 @@ from typing import Any
 
 API = "https://commons.wikimedia.org/w/api.php"
 CATEGORY = "Category:Lingua Libre pronunciation-ind"
-CC0_NAMES = {"CC0 1.0", "CC0 1.0 Universal", "Public domain"}
+CC0_NAMES = {"CC0 1.0", "CC0 1.0 Universal"}
 USER_AGENT = "IndonesianEngineerApp/0.7 audio-builder"
 PAUSE_MS = 120
 TARGET_LINES = 3000
 MAX_LINES = 3000
-DATASET_URL = "https://lingualibre.org/datasets/Q305-ind-Indonesian.zip"
 
 
 def request_json(params: dict[str, Any], retries: int = 8) -> dict[str, Any]:
@@ -258,26 +256,6 @@ def write_index(path: Path, rows: list[dict[str, Any]]) -> None:
                 row["source_url"],
                 row["license"],
             ])
-
-
-def download_dataset_zip(cache_root: Path) -> Path:
-    destination = cache_root / "Q305-ind-Indonesian.zip"
-    if destination.exists() and destination.stat().st_size > 0:
-        return destination
-
-    print("Downloading Lingua Libre Indonesian dataset:", DATASET_URL)
-    download_file(DATASET_URL, destination)
-    return destination
-
-
-def build_zip_name_map(dataset_zip: zipfile.ZipFile) -> dict[str, str]:
-    result: dict[str, str] = {}
-    for member in dataset_zip.namelist():
-        if not member.lower().endswith(".wav"):
-            continue
-        name = member.rsplit("/", 1)[-1]
-        result[name] = member
-    return result
 
 
 def normalize_wav_bytes(raw: bytes) -> tuple[bytes, int]:
