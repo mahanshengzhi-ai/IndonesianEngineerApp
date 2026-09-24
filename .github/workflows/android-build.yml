@@ -28,8 +28,38 @@ jobs:
           unzip -q /tmp/gradle.zip -d /opt
           echo "/opt/gradle-8.13/bin" >> "$GITHUB_PATH"
 
-      - name: Validate content and forbidden APIs
-        run: python3 scripts/validate_content.py
+      - name: Restore generated Indonesian audio cache
+        id: audio-cache
+        uses: actions/cache@v6
+        with:
+          path: |
+            build/generated_audio
+            app/src/main/assets/tts_audio.m4a
+            app/src/main/assets/tts_index.tsv
+          key: ${{ runner.os }}-indonesian-audio-${{ hashFiles('app/src/main/assets/words_*.tsv', 'app/src/main/assets/sentences.tsv', 'app/src/main/assets/scenes.tsv', 'app/src/main/assets/letters.tsv', 'scripts/generate_audio.py') }}
+
+      - name: Install audio build tools
+        if: steps.audio-cache.outputs.cache-hit != 'true'
+        run: |
+          python3 -m pip install --disable-pip-version-check --no-input edge-tts==7.2.8 mutagen
+          ffmpeg -version | head -n 1
+
+      - name: Generate bundled Indonesian audio
+        if: steps.audio-cache.outputs.cache-hit != 'true'
+        env:
+          INDONESIAN_VOICE: id-ID-ArdiNeural
+          INDONESIAN_RATE: -12%
+          INDONESIAN_VOLUME: +0%
+          INDONESIAN_PITCH: +0Hz
+          AUDIO_CONCURRENCY: "8"
+        run: python3 scripts/generate_audio.py
+
+      - name: Verify bundled audio assets
+        run: |
+          test -s app/src/main/assets/tts_audio.m4a
+          test -s app/src/main/assets/tts_index.tsv
+          ffprobe -v error -select_streams a:0 -show_entries stream=codec_name,sample_rate,channels -of default=nw=1 app/src/main/assets/tts_audio.m4a
+          python3 scripts/validate_content.py --strict-audio
 
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace
