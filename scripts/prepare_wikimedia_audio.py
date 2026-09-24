@@ -20,7 +20,7 @@ ASSETS = ROOT / "app" / "src" / "main" / "assets"
 CATEGORY = "Category:Lingua Libre pronunciation-ind"
 API = "https://commons.wikimedia.org/w/api.php"
 UA = "IndonesianEngineerApp/0.1 (open-source audio build)"
-MAX_AUDIO = 800
+MAX_AUDIO = 300
 
 def normalize(text: str) -> str:
     text = unicodedata.normalize("NFC", text or "")
