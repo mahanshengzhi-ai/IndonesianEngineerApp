@@ -102,11 +102,11 @@ class HomePage(
         UiKit.addGap(content, activity, 6)
         content.addView(UiKit.muted(activity, sentence.scene, 13f))
 
-        val audio = UiKit.secondaryButton(activity, "听发音")
-        audio.setOnClickListener {
-            activity.playAudio(sentence.indonesian)
+        if (activity.hasAudio(sentence.indonesian)) {
+            val audio = UiKit.secondaryButton(activity, "听发音")
+            audio.setOnClickListener { activity.playAudio(sentence.indonesian) }
+            content.addView(audio)
         }
-        content.addView(audio)
 
         card.addView(content)
         parent.addView(card)
