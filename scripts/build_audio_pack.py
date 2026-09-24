@@ -339,7 +339,11 @@ def make_concat_audio(
     with concat_file.open("w", encoding="utf-8") as playlist:
         for number, item in enumerate(selected, start=1):
             clip_path = audio_dir / (f"{number:04d}.wav")
-            member_name = zip_members.get(item["title"])
+            title_without_prefix = item["title"].removeprefix("File:")
+            member_name = (
+                zip_members.get(item["title"])
+                or zip_members.get(title_without_prefix)
+            )
 
             if member_name:
                 with dataset_zip.open(member_name, "r") as source, clip_path.open("wb") as target:
