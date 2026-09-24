@@ -8,6 +8,7 @@ import subprocess
 import tempfile
 import os
 import shutil
+import time
 import unicodedata
 from pathlib import Path
 from urllib.parse import unquote
@@ -49,9 +50,16 @@ def desired_texts() -> list[str]:
     return list(unique.values())
 
 def get_json(session: requests.Session, params: dict) -> dict:
-    response = session.get(API, params=params, timeout=60)
-    response.raise_for_status()
-    return response.json()
+    for attempt in range(7):
+        response = session.get(API, params=params, timeout=60)
+        if response.status_code != 429:
+            response.raise_for_status()
+            return response.json()
+        retry_after = response.headers.get("Retry-After")
+        delay = float(retry_after) if retry_after else min(30.0, 2.0 ** attempt)
+        print("Wikimedia API rate limited; retrying in", delay, "seconds")
+        time.sleep(delay)
+    raise RuntimeError("Wikimedia API remained rate-limited after retries")
 
 def list_category_files(session: requests.Session) -> list[str]:
     titles: list[str] = []
@@ -64,13 +72,14 @@ def list_category_files(session: requests.Session) -> list[str]:
             "cmtitle": CATEGORY,
             "cmnamespace": "6",
             "cmtype": "file",
-            "cmlimit": "max",
+            "cmlimit": 200,
             **cont,
         }
         data = get_json(session, params)
         titles.extend(item["title"] for item in data.get("query", {}).get("categorymembers", []))
         if "continue" not in data:
             break
+        time.sleep(1.5)
         cont = {
             "cmcontinue": data["continue"]["cmcontinue"],
             "continue": data["continue"]["continue"],
