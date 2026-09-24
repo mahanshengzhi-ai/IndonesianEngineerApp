@@ -4,224 +4,184 @@ import android.os.Bundle
 import android.os.SystemClock
 import android.view.View
 import android.widget.FrameLayout
+import android.widget.LinearLayout
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.media3.common.util.UnstableApi
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mahanshengzhi.indonesianengineer.audio.AudioPlayer
 import com.mahanshengzhi.indonesianengineer.data.LearningRepository
 import com.mahanshengzhi.indonesianengineer.data.ProgressStore
-import com.mahanshengzhi.indonesianengineer.model.Vocabulary
 import com.mahanshengzhi.indonesianengineer.translation.TranslationEngine
-import com.mahanshengzhi.indonesianengineer.ui.MiniPlayerController
-import com.mahanshengzhi.indonesianengineer.ui.pages.FlashcardPage
-import com.mahanshengzhi.indonesianengineer.ui.pages.HomePage
-import com.mahanshengzhi.indonesianengineer.ui.pages.LearnPage
-import com.mahanshengzhi.indonesianengineer.ui.pages.PracticePage
-import com.mahanshengzhi.indonesianengineer.ui.pages.ProfilePage
-import com.mahanshengzhi.indonesianengineer.ui.pages.PronunciationPage
-import com.mahanshengzhi.indonesianengineer.ui.pages.QuizPage
-import com.mahanshengzhi.indonesianengineer.ui.pages.ScenePage
-import com.mahanshengzhi.indonesianengineer.ui.pages.SentencePage
-import com.mahanshengzhi.indonesianengineer.ui.pages.TranslatePage
-import com.mahanshengzhi.indonesianengineer.ui.pages.VocabularyPage
-import com.mahanshengzhi.indonesianengineer.ui.pages.WordDetailPage
-import java.util.concurrent.ExecutorService
-import java.util.concurrent.Executors
+import com.mahanshengzhi.indonesianengineer.ui.HomePage
+import com.mahanshengzhi.indonesianengineer.ui.PracticePage
+import com.mahanshengzhi.indonesianengineer.ui.ProfilePage
+import com.mahanshengzhi.indonesianengineer.ui.StudyPage
+import com.mahanshengzhi.indonesianengineer.ui.TranslatePage
+import com.mahanshengzhi.indonesianengineer.ui.Ui
 
-@OptIn(UnstableApi::class)
+@UnstableApi
 class MainActivity : AppCompatActivity() {
-
-    enum class LearnModule {
-        PRONUNCIATION,
-        VOCABULARY,
-        SENTENCE,
-        SCENE
-    }
-
-    enum class PracticeModule {
-        FLASHCARD,
-        QUIZ
-    }
-
-    lateinit var repository: LearningRepository
-        private set
-
-    lateinit var progressStore: ProgressStore
-        private set
-
-    lateinit var audioPlayer: AudioPlayer
-        private set
-
-    lateinit var translationEngine: TranslationEngine
-        private set
-
-    lateinit var miniPlayer: MiniPlayerController
-        private set
-
-    val backgroundExecutor: ExecutorService by lazy {
-        Executors.newSingleThreadExecutor()
-    }
 
     private lateinit var contentContainer: FrameLayout
     private lateinit var bottomNavigation: BottomNavigationView
+    private lateinit var playerContainer: LinearLayout
+
+    private val repository by lazy { LearningRepository(this) }
+    private val progress by lazy { ProgressStore(this) }
+    private val translationEngine by lazy { TranslationEngine() }
+    private val audioPlayer by lazy { AudioPlayer(this) }
+
     private var lastBackAt = 0L
-    private var showingSubpage = false
+    private var playingText = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        repository = LearningRepository(this)
-        progressStore = ProgressStore(this)
-        audioPlayer = AudioPlayer(this)
-        translationEngine = TranslationEngine()
-
         contentContainer = findViewById(R.id.contentContainer)
         bottomNavigation = findViewById(R.id.bottomNavigation)
+        playerContainer = findViewById(R.id.playerContainer)
 
         bottomNavigation.inflateMenu(R.menu.bottom_nav)
-        bottomNavigation.setOnItemSelectedListener { item ->
-            renderRootPage(item.itemId)
+        bottomNavigation.setOnItemSelectedListener {
+            renderPage(it.itemId)
             true
         }
-
-        miniPlayer = MiniPlayerController(
-            this,
-            findViewById(R.id.playerContainer),
-            audioPlayer,
-            progressStore
-        )
-
         bottomNavigation.selectedItemId = R.id.nav_home
 
-        onBackPressedDispatcher.addCallback(
-            this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (showingSubpage || bottomNavigation.selectedItemId != R.id.nav_home) {
-                        showingSubpage = false
-                        bottomNavigation.selectedItemId = R.id.nav_home
-                        return
-                    }
-
-                    val now = SystemClock.elapsedRealtime()
-                    if (now - lastBackAt < 1800L) {
-                        finish()
-                    } else {
-                        lastBackAt = now
-                        Toast.makeText(
-                            this@MainActivity,
-                            "再按一次退出软件",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (bottomNavigation.selectedItemId != R.id.nav_home) {
+                    bottomNavigation.selectedItemId = R.id.nav_home
+                    return
+                }
+                val now = SystemClock.elapsedRealtime()
+                if (now - lastBackAt < 1800L) {
+                    finish()
+                } else {
+                    lastBackAt = now
+                    Toast.makeText(this@MainActivity, "再按一次退出软件", Toast.LENGTH_SHORT).show()
                 }
             }
-        )
+        })
     }
 
-    private fun renderRootPage(itemId: Int) {
-        showingSubpage = false
-        contentContainer.removeAllViews()
-
-        val view = when (itemId) {
-            R.id.nav_home -> HomePage(this, repository, progressStore).build()
-            R.id.nav_learn -> LearnPage(this).build()
-            R.id.nav_practice -> PracticePage(this, progressStore).build()
-            R.id.nav_translate -> TranslatePage(this, translationEngine, progressStore).build()
-            R.id.nav_profile -> ProfilePage(this, progressStore).build()
-            else -> HomePage(this, repository, progressStore).build()
-        }
-
-        addContent(view)
-    }
-
-    private fun addContent(view: View) {
-        contentContainer.addView(
-            view,
-            FrameLayout.LayoutParams(
-                FrameLayout.LayoutParams.MATCH_PARENT,
-                FrameLayout.LayoutParams.MATCH_PARENT
+    private fun renderPage(itemId: Int) {
+        val page = when (itemId) {
+            R.id.nav_home -> HomePage.build(
+                this,
+                learned = progress.learnedTotal(),
+                streak = progress.streak(),
+                dailyWords = progress.dailyWords(),
+                dailyAudio = progress.dailyAudio(),
+                dailyQuiz = progress.dailyQuiz(),
+                dailyTranslation = progress.dailyTranslation(),
+                onStart = { bottomNavigation.selectedItemId = R.id.nav_learn },
+                onCheckIn = {
+                    progress.checkIn()
+                    Toast.makeText(this, "今日已打卡，明天继续", Toast.LENGTH_SHORT).show()
+                    renderPage(R.id.nav_home)
+                },
+                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn }
             )
-        )
-    }
-
-    fun showSubpage(navId: Int, view: View) {
-        showingSubpage = true
-        if (bottomNavigation.selectedItemId != navId) {
-            bottomNavigation.selectedItemId = navId
+            R.id.nav_learn -> StudyPage.build(
+                this,
+                repository,
+                onPlay = ::playAudio,
+                hasAudio = audioPlayer::hasAudio,
+                onMarkLearned = {
+                    progress.markLearned(it)
+                    progress.markDailyWord()
+                }
+            )
+            R.id.nav_practice -> PracticePage.build(
+                this,
+                progress,
+                onMarkQuiz = {
+                    progress.incrementQuiz()
+                    progress.updateBestQuiz(7)
+                    Toast.makeText(this, "这一组完成，已记录 7 / 10", Toast.LENGTH_SHORT).show()
+                    renderPage(R.id.nav_practice)
+                }
+            )
+            R.id.nav_translate -> TranslatePage.build(this, translationEngine, progress)
+            R.id.nav_profile -> ProfilePage.build(this, progress)
+            else -> HomePage.build(
+                this, progress.learnedTotal(), progress.streak(), progress.dailyWords(),
+                progress.dailyAudio(), progress.dailyQuiz(), progress.dailyTranslation(), {}, {}, {}
+            )
         }
+
         contentContainer.removeAllViews()
-        addContent(view)
+        val scroll = Ui.scroll(this, page)
+        contentContainer.addView(scroll)
     }
 
-    fun openLearnModule(module: LearnModule) {
-        when (module) {
-            LearnModule.PRONUNCIATION ->
-                showSubpage(R.id.nav_learn, PronunciationPage(this, repository).build())
-
-            LearnModule.VOCABULARY ->
-                showSubpage(
-                    R.id.nav_learn,
-                    VocabularyPage(this, repository, progressStore).build()
-                )
-
-            LearnModule.SENTENCE ->
-                showSubpage(
-                    R.id.nav_learn,
-                    SentencePage(this, repository, progressStore).build()
-                )
-
-            LearnModule.SCENE ->
-                showSubpage(
-                    R.id.nav_learn,
-                    ScenePage(this, repository, progressStore).build()
-                )
-        }
-    }
-
-    fun openPracticeModule(module: PracticeModule) {
-        when (module) {
-            PracticeModule.FLASHCARD ->
-                showSubpage(
-                    R.id.nav_practice,
-                    FlashcardPage(this, repository, progressStore).build()
-                )
-
-            PracticeModule.QUIZ ->
-                showSubpage(
-                    R.id.nav_practice,
-                    QuizPage(this, repository, progressStore).build()
-                )
-        }
-    }
-
-    fun openWord(item: Vocabulary) {
-        showSubpage(
-            R.id.nav_learn,
-            WordDetailPage(this, item, progressStore).build()
-        )
-    }
-
-    fun hasAudio(text: String): Boolean = audioPlayer.hasAudio(text)
-
-    fun playAudio(text: String) {
-        if (!miniPlayer.play(text)) {
+    private fun playAudio(text: String) {
+        if (text.isBlank()) {
             Toast.makeText(this, "暂无内置语音", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (!audioPlayer.hasAudio(text)) {
+            Toast.makeText(this, "暂无内置语音", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (audioPlayer.play(text)) {
+            playingText = text
+            progress.incrementAudio()
+            showPlayer(text)
+        } else {
+            Toast.makeText(this, "音频播放失败", Toast.LENGTH_SHORT).show()
         }
     }
 
-    fun setAudioSpeed(speed: Float) {
-        audioPlayer.setSpeed(speed)
+    private fun showPlayer(text: String) {
+        playerContainer.removeAllViews()
+        val box = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(Ui.dp(this@MainActivity, 16), Ui.dp(this@MainActivity, 10), Ui.dp(this@MainActivity, 16), Ui.dp(this@MainActivity, 10))
+        }
+
+        val title = TextView(this).apply {
+            this.text = text
+            textSize = 15f
+            setTextColor(ContextCompat.getColor(context, R.color.text_primary))
+            includeFontPadding = true
+            maxLines = 2
+        }
+        box.addView(title)
+
+        val actions = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            gravity = android.view.Gravity.CENTER_VERTICAL
+        }
+        actions.addView(Ui.button(this, "暂停") { audioPlayer.pause() }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f))
+        actions.addView(Ui.button(this, "0.8x") { audioPlayer.setSpeed(0.8f) }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
+            leftMargin = Ui.dp(this@MainActivity, 6)
+        })
+        actions.addView(Ui.button(this, "1.0x") { audioPlayer.setSpeed(1.0f) }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
+            leftMargin = Ui.dp(this@MainActivity, 6)
+        })
+        actions.addView(Ui.button(this, "关闭") {
+            audioPlayer.pause()
+            playerContainer.removeAllViews()
+            playerContainer.visibility = View.GONE
+            playingText = ""
+        }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
+            leftMargin = Ui.dp(this@MainActivity, 6)
+        })
+        box.addView(actions)
+        playerContainer.addView(box)
+        playerContainer.visibility = View.VISIBLE
     }
 
     override fun onDestroy() {
-        miniPlayer.dispose()
         audioPlayer.release()
         translationEngine.close()
-        backgroundExecutor.shutdownNow()
         super.onDestroy()
     }
 }
