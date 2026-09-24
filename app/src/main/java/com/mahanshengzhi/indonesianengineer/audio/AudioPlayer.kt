@@ -12,6 +12,7 @@ class AudioPlayer(context: Context) {
     private val appContext = context.applicationContext
     private var player: ExoPlayer? = null
     private val index = AudioIndex(appContext)
+    private var requestedSpeed = 1.0f
 
     fun hasAudio(text: String): Boolean = index.find(text) != null
 
@@ -24,7 +25,11 @@ class AudioPlayer(context: Context) {
 
         val item = MediaItem.Builder()
             .setUri("asset:///tts_audio.m4a")
-            .setMediaMetadata(MediaMetadata.Builder().setTitle(segment.originalText).build())
+            .setMediaMetadata(
+                MediaMetadata.Builder()
+                    .setTitle(segment.originalText)
+                    .build()
+            )
             .setClippingConfiguration(
                 MediaItem.ClippingConfiguration.Builder()
                     .setStartPositionMs(segment.startMs)
@@ -34,9 +39,13 @@ class AudioPlayer(context: Context) {
             .build()
 
         if (player == null) {
-            player = ExoPlayer.Builder(appContext).build()
+            player = ExoPlayer.Builder(appContext).build().also {
+                it.playbackParameters = PlaybackParameters(requestedSpeed)
+            }
         }
+
         player?.setMediaItem(item)
+        player?.playbackParameters = PlaybackParameters(requestedSpeed)
         player?.prepare()
         player?.play()
         return true
@@ -53,7 +62,8 @@ class AudioPlayer(context: Context) {
     }
 
     fun setSpeed(speed: Float) {
-        player?.playbackParameters = PlaybackParameters(speed.coerceIn(0.8f, 1.0f))
+        requestedSpeed = speed.coerceIn(0.8f, 1.0f)
+        player?.playbackParameters = PlaybackParameters(requestedSpeed)
     }
 
     fun seekTo(positionMs: Long) {
