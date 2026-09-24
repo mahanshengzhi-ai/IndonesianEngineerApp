@@ -30,6 +30,8 @@ object FlashcardPage {
         var known = 0
         var revealed = false
 
+        lateinit var render: () -> Unit
+
         fun advance(wordKnown: Boolean) {
             store.markDailyFlashcard()
             if (wordKnown) {
@@ -42,7 +44,7 @@ object FlashcardPage {
             render()
         }
 
-        fun render() {
+        render = {
             content.removeAllViews()
 
             if (current >= source.size) {
