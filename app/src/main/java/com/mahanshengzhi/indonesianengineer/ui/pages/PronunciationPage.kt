@@ -87,8 +87,11 @@ class PronunciationPage(
         content.addView(UiKit.body(activity, "示例：" + letter.example, 18f))
 
         val audioRow = UiKit.buttonRow(activity)
-        val slow = UiKit.secondaryButton(activity, "慢速听")
-        val normal = UiKit.secondaryButton(activity, "正常听")
+        val hasAudio = activity.hasAudio(letter.example)
+        val slow = UiKit.secondaryButton(activity, if (hasAudio) "慢速听" else "暂无内置语音")
+        val normal = UiKit.secondaryButton(activity, if (hasAudio) "正常听" else "暂无内置语音")
+        slow.isEnabled = hasAudio
+        normal.isEnabled = hasAudio
         UiKit.addWeightedButton(audioRow, slow, activity, 0.5f, 6)
         UiKit.addWeightedButton(audioRow, normal, activity, 0.5f)
 
