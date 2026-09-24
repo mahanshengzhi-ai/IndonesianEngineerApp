@@ -71,8 +71,8 @@ jobs:
           ffprobe -v error -select_streams a:0 -show_entries stream=codec_name,sample_rate,channels -of default=nw=1 app/src/main/assets/tts_audio.m4a
           python3 scripts/validate_content.py --strict-audio
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+      - name: Test, lint and build debug APK
+        run: gradle :app:testDebugUnitTest :app:lintDebug :app:assembleDebug --stacktrace
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v7
