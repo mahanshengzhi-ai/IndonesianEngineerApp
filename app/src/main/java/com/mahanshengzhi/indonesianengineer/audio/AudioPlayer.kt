@@ -40,6 +40,7 @@ class AudioPlayer(context: Context) {
 
         if (player == null) {
             player = ExoPlayer.Builder(appContext).build().also {
+                it.volume = 0.88f
                 it.playbackParameters = PlaybackParameters(requestedSpeed)
             }
         }
