@@ -36,6 +36,11 @@ def collect_audio_texts(words, sentences, scenes, letters):
     texts.extend(r["example"] for r in letters if r.get("example"))
     return list(dict.fromkeys(texts))
 
+def count_cjk_in_vocabulary(rows):
+    import re
+    pattern = re.compile(r"[\\u3400-\\u4dbf\\u4e00-\\u9fff]")
+    return sum(1 for row in rows if pattern.search(row.get("indonesian", "")))
+
 def scan_forbidden():
     hits = []
     for path in APP.rglob("*"):
@@ -77,6 +82,8 @@ def main():
     indonesian_keys = [r["indonesian"].strip() for r in words if r.get("indonesian")]
     print(f"WORD_DUPLICATE_IDS = {len(word_ids) - len(set(word_ids))}")
     print(f"WORD_DUPLICATE_AUDIO_KEYS = {len(indonesian_keys) - len(set(indonesian_keys))}")
+    invalid_indonesian = count_cjk_in_vocabulary(words)
+    print(f"INVALID_INDONESIAN_TEXT = {invalid_indonesian}")
 
     texts = collect_audio_texts(words, sentences, scenes, letters)
     index_path = ASSETS / "tts_index.tsv"
@@ -123,6 +130,7 @@ def main():
         problems.append("A_SCENE_HAS_FEWER_THAN_6_TURNS")
     if len(letters) != 26:
         problems.append(f"LETTER_COUNT != 26 ({len(letters)})")
+    if invalid_indonesian:\n        problems.append("INVALID_INDONESIAN_TEXT > 0")
     if forbidden_hits:
         problems.append("FORBIDDEN_API_HITS > 0")
     if duplicate_audio_keys:
