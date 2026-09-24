@@ -5,7 +5,6 @@ import argparse
 import csv
 import hashlib
 import re
-import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
