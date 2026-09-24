@@ -396,8 +396,8 @@ class MainActivity : AppCompatActivity() {
         addPlayerAction(actions, "0.8x") {
             audioPlayer.setSpeed(0.8f)
         }
-        addPlayerAction(actions, "0.9x") {
-            audioPlayer.setSpeed(0.9f)
+        addPlayerAction(actions, "0.88x") {
+            audioPlayer.setSpeed(0.88f)
         }
         addPlayerAction(actions, "1.0x") {
             audioPlayer.setSpeed(1.0f)
