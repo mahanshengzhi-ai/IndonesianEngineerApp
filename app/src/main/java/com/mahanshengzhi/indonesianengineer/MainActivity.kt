@@ -21,6 +21,7 @@ import com.mahanshengzhi.indonesianengineer.data.ProgressStore
 import com.mahanshengzhi.indonesianengineer.translation.TranslationEngine
 import com.mahanshengzhi.indonesianengineer.ui.HomePage
 import com.mahanshengzhi.indonesianengineer.ui.PracticePage
+import com.mahanshengzhi.indonesianengineer.ui.PronunciationPage
 import com.mahanshengzhi.indonesianengineer.ui.ProfilePage
 import com.mahanshengzhi.indonesianengineer.ui.QuizPage
 import com.mahanshengzhi.indonesianengineer.ui.SceneDetailPage
@@ -113,6 +114,9 @@ class MainActivity : AppCompatActivity() {
                 repository,
                 audioPlayer::hasAudio,
                 ::playAudio,
+                onOpenPronunciation = {
+                    showSubPage(PronunciationPage.build(this, repository, audioPlayer::hasAudio, ::playAudio))
+                },
                 onOpenVocabulary = {
                     showSubPage(
                         VocabularyPage.build(
