@@ -47,12 +47,20 @@ def count_cjk_in_vocabulary(rows) -> int:
     return sum(1 for row in rows if CJK_PATTERN.search(row.get("indonesian", "")))
 
 
+TEXT_SCAN_SUFFIXES = {
+    ".kt", ".kts", ".java", ".xml", ".gradle", ".properties",
+    ".py", ".sh", ".yml", ".yaml", ".json", ".md", ".txt", ".tsv"
+}
+
+
 def scan_forbidden():
     hits = []
     for path in APP.rglob("*"):
         if not path.is_file():
             continue
         if "build" in path.parts:
+            continue
+        if path.suffix.lower() not in TEXT_SCAN_SUFFIXES:
             continue
         try:
             text = path.read_text("utf-8", errors="ignore")
@@ -121,7 +129,14 @@ def main():
     print(f"INDEXED_AUDIO = {len(index)}")
     print(f"DUPLICATE_AUDIO_KEYS = {duplicate_audio_keys}")
 
-    licensed = sum(1 for row in index.values() if row.get("license", "").strip())
+    verified_license_markers = (
+        "CC0", "CC BY", "CC-BY", "PUBLIC DOMAIN", "WIKIMEDIA"
+    )
+    licensed = sum(
+        1
+        for row in index.values()
+        if any(marker in row.get("license", "").upper() for marker in verified_license_markers)
+    )
     print(f"LICENSED_AUDIO = {licensed}")
     print(f"AUDIO_ASSET_PRESENT = {(ASSETS / 'tts_audio.m4a').exists()}")
 
