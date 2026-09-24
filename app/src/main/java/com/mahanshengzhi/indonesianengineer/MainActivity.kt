@@ -1,10 +1,13 @@
 package com.mahanshengzhi.indonesianengineer
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.os.SystemClock
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.LinearLayout
+import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -39,6 +42,19 @@ class MainActivity : AppCompatActivity() {
     private val progress by lazy { ProgressStore(this) }
     private val translationEngine by lazy { TranslationEngine() }
     private val audioPlayer by lazy { AudioPlayer(this) }
+
+    private val playerHandler = Handler(Looper.getMainLooper())
+    private var playerSeekBar: SeekBar? = null
+    private var playerPositionText: TextView? = null
+    private var playerDurationText: TextView? = null
+    private var playerPlayPauseButton: com.google.android.material.button.MaterialButton? = null
+
+    private val playerTicker = object : Runnable {
+        override fun run() {
+            updatePlayerProgress()
+            playerHandler.postDelayed(this, 300L)
+        }
+    }
 
     private var lastBackAt = 0L
 
@@ -97,9 +113,26 @@ class MainActivity : AppCompatActivity() {
                 repository,
                 audioPlayer::hasAudio,
                 ::playAudio,
-                onOpenVocabulary = { showSubPage(VocabularyPage.build(this, repository, audioPlayer::hasAudio, ::playAudio) { progress.markLearned(it); progress.markDailyWord() }) },
-                onOpenSentences = { showSubPage(SentencePage.build(this, repository, audioPlayer::hasAudio, ::playAudio)) },
-                onOpenScenes = { showSubPage(ScenePage.build(this, repository) { id -> showSubPage(SceneDetailPage.build(this, repository, id, audioPlayer::hasAudio, ::playAudio)) }) },
+                onOpenVocabulary = {
+                    showSubPage(
+                        VocabularyPage.build(
+                            this, repository, audioPlayer::hasAudio, ::playAudio
+                        ) {
+                            progress.markLearned(it)
+                            progress.markDailyWord()
+                        }
+                    )
+                },
+                onOpenSentences = {
+                    showSubPage(SentencePage.build(this, repository, audioPlayer::hasAudio, ::playAudio))
+                },
+                onOpenScenes = {
+                    showSubPage(
+                        ScenePage.build(this, repository) { id ->
+                            showSubPage(SceneDetailPage.build(this, repository, id, audioPlayer::hasAudio, ::playAudio))
+                        }
+                    )
+                },
                 onOpenPractice = { bottomNavigation.selectedItemId = R.id.nav_practice },
                 onMarkLearned = {
                     progress.markLearned(it)
@@ -109,7 +142,13 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_practice -> PracticePage.build(
                 this,
                 progress,
-                onStartQuiz = { showSubPage(QuizPage.build(this, repository, progress) { bottomNavigation.selectedItemId = R.id.nav_practice }) }
+                onStartQuiz = {
+                    showSubPage(
+                        QuizPage.build(this, repository, progress) {
+                            bottomNavigation.selectedItemId = R.id.nav_practice
+                        }
+                    )
+                }
             )
             R.id.nav_translate -> TranslatePage.build(this, translationEngine, progress)
             R.id.nav_profile -> ProfilePage.build(this, progress)
@@ -145,7 +184,12 @@ class MainActivity : AppCompatActivity() {
         playerContainer.removeAllViews()
         val box = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
-            setPadding(Ui.dp(this@MainActivity, 16), Ui.dp(this@MainActivity, 10), Ui.dp(this@MainActivity, 16), Ui.dp(this@MainActivity, 10))
+            setPadding(
+                Ui.dp(this@MainActivity, 16),
+                Ui.dp(this@MainActivity, 10),
+                Ui.dp(this@MainActivity, 16),
+                Ui.dp(this@MainActivity, 10)
+            )
         }
 
         box.addView(TextView(this).apply {
@@ -156,30 +200,113 @@ class MainActivity : AppCompatActivity() {
             maxLines = 2
         })
 
+        playerPositionText = TextView(this).apply {
+            textSize = 12f
+            setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+            text = "0:00"
+        }
+        playerDurationText = TextView(this).apply {
+            textSize = 12f
+            setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
+            text = "0:00"
+            gravity = android.view.Gravity.END
+        }
+
+        val timeRow = LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(playerPositionText, LinearLayout.LayoutParams(0, Ui.dp(this@MainActivity, 22), 1f))
+            addView(playerDurationText, LinearLayout.LayoutParams(0, Ui.dp(this@MainActivity, 22), 1f))
+        }
+        box.addView(timeRow)
+
+        playerSeekBar = SeekBar(this).apply {
+            max = 1000
+            setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
+                override fun onProgressChanged(seekBar: SeekBar?, progressValue: Int, fromUser: Boolean) {
+                    if (fromUser) {
+                        val duration = audioPlayer.duration()
+                        audioPlayer.seekTo(duration * progressValue / 1000L)
+                    }
+                }
+
+                override fun onStartTrackingTouch(seekBar: SeekBar?) = Unit
+                override fun onStopTrackingTouch(seekBar: SeekBar?) = Unit
+            })
+        }
+        box.addView(playerSeekBar)
+
         val actions = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
             gravity = android.view.Gravity.CENTER_VERTICAL
         }
-        actions.addView(Ui.button(this, "暂停") { audioPlayer.pause() }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f))
-        actions.addView(Ui.button(this, "0.8x") { audioPlayer.setSpeed(0.8f) }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
+        playerPlayPauseButton = Ui.button(this, "暂停") {
+            audioPlayer.playOrPause()
+            updatePlayerProgress()
+        }
+        actions.addView(playerPlayPauseButton, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f))
+        actions.addView(Ui.button(this, "0.8x") {
+            audioPlayer.setSpeed(0.8f)
+        }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
             leftMargin = Ui.dp(this@MainActivity, 6)
         })
-        actions.addView(Ui.button(this, "1.0x") { audioPlayer.setSpeed(1.0f) }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
+        actions.addView(Ui.button(this, "0.9x") {
+            audioPlayer.setSpeed(0.9f)
+        }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
+            leftMargin = Ui.dp(this@MainActivity, 6)
+        })
+        actions.addView(Ui.button(this, "1.0x") {
+            audioPlayer.setSpeed(1.0f)
+        }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
             leftMargin = Ui.dp(this@MainActivity, 6)
         })
         actions.addView(Ui.button(this, "关闭") {
             audioPlayer.pause()
-            playerContainer.removeAllViews()
-            playerContainer.visibility = View.GONE
+            closePlayer()
         }, LinearLayout.LayoutParams(0, Ui.dp(this, 44), 1f).apply {
             leftMargin = Ui.dp(this@MainActivity, 6)
         })
         box.addView(actions)
+
         playerContainer.addView(box)
         playerContainer.visibility = View.VISIBLE
+        updatePlayerProgress()
+        playerHandler.removeCallbacks(playerTicker)
+        playerHandler.post(playerTicker)
+    }
+
+    private fun closePlayer() {
+        playerHandler.removeCallbacks(playerTicker)
+        playerContainer.removeAllViews()
+        playerContainer.visibility = View.GONE
+        playerSeekBar = null
+        playerPositionText = null
+        playerDurationText = null
+        playerPlayPauseButton = null
+    }
+
+    private fun updatePlayerProgress() {
+        val duration = audioPlayer.duration()
+        val position = audioPlayer.currentPosition()
+        playerSeekBar?.let {
+            it.max = 1000
+            if (duration > 0L) {
+                it.progress = (position * 1000L / duration).toInt().coerceIn(0, 1000)
+            }
+        }
+        playerPositionText?.text = formatTime(position)
+        playerDurationText?.text = formatTime(duration)
+        playerPlayPauseButton?.text = if (audioPlayer.isPlaying()) "暂停" else "继续"
+    }
+
+    private fun formatTime(ms: Long): String {
+        val totalSeconds = (ms.coerceAtLeast(0L) / 1000L)
+        val minutes = totalSeconds / 60
+        val seconds = totalSeconds % 60
+        return "%d:%02d".format(minutes, seconds)
     }
 
     override fun onDestroy() {
+        playerHandler.removeCallbacks(playerTicker)
         audioPlayer.release()
         translationEngine.close()
         super.onDestroy()
