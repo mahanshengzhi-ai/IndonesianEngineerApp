@@ -1,10 +1,17 @@
 package com.mahanshengzhi.indonesianengineer.data
 
 import android.content.Context
+import com.mahanshengzhi.indonesianengineer.translation.TranslationDirection
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+
+data class TranslationRecord(
+    val direction: TranslationDirection,
+    val input: String,
+    val output: String
+)
 
 class ProgressStore(context: Context) {
     private val prefs = context.getSharedPreferences("learning_progress", Context.MODE_PRIVATE)
@@ -83,21 +90,52 @@ class ProgressStore(context: Context) {
     fun streak(): Int = prefs.getInt("streak", 0)
     fun lastCheckIn(): String = prefs.getString("last_checkin", "") ?: ""
 
-    fun recordTranslation(text: String) {
-        val normalized = text.trim()
-        if (normalized.isEmpty()) return
-        val old = recentTranslations().toMutableList()
-        old.remove(normalized)
-        old.add(0, normalized)
-        while (old.size > 6) old.removeAt(old.lastIndex)
-        prefs.edit().putString("recent_translations", old.joinToString("\u0001")).apply()
+    fun recordTranslation(
+        direction: TranslationDirection,
+        input: String,
+        output: String
+    ) {
+        val normalizedInput = input.trim()
+        val normalizedOutput = output.trim()
+        if (normalizedInput.isEmpty() || normalizedOutput.isEmpty()) return
+
+        val records = recentTranslationRecords().toMutableList()
+        records.removeAll {
+            it.direction == direction &&
+                it.input == normalizedInput &&
+                it.output == normalizedOutput
+        }
+        records.add(
+            0,
+            TranslationRecord(direction, normalizedInput, normalizedOutput)
+        )
+
+        while (records.size > 6) {
+            records.removeAt(records.lastIndex)
+        }
+
+        val encoded = records.joinToString("\u0001") {
+            listOf(it.direction.name, it.input, it.output).joinToString("\u0002")
+        }
+        prefs.edit().putString("recent_translation_records", encoded).apply()
     }
 
-    fun recentTranslations(): List<String> =
-        prefs.getString("recent_translations", "")
+    fun recentTranslationRecords(): List<TranslationRecord> =
+        prefs.getString("recent_translation_records", "")
             .orEmpty()
             .split("\u0001")
-            .filter { it.isNotEmpty() }
+            .filter { it.isNotBlank() }
+            .mapNotNull { item ->
+                val fields = item.split("\u0002", limit = 3)
+                if (fields.size != 3) return@mapNotNull null
+                val direction = runCatching {
+                    TranslationDirection.valueOf(fields[0])
+                }.getOrNull() ?: return@mapNotNull null
+                TranslationRecord(direction, fields[1], fields[2])
+            }
+
+    fun recentTranslations(): List<String> =
+        recentTranslationRecords().map { it.input }
 
     private fun previousDate(): String {
         val calendar = Calendar.getInstance()
