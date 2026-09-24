@@ -1,0 +1,38 @@
+name: Android Build
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Gradle 8.13
+        run: |
+          curl -fsSL -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.13-bin.zip
+          unzip -q /tmp/gradle.zip -d /opt
+          echo "/opt/gradle-8.13/bin" >> "$GITHUB_PATH"
+
+      - name: Build debug APK
+        run: gradle :app:assembleDebug --stacktrace
+
+      - name: Scan forbidden runtime speech APIs
+        run: |
+          ! grep -RInE 'TextToSpeech|SpeechRecognizer|RecognizerIntent|RECORD_AUDIO|MediaPlayer|sherpa-onnx|onnx|espeak' app --exclude-dir=build
+
+      - name: Upload debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: IndonesianEngineer-debug
+          path: app/build/outputs/apk/debug/*.apk
