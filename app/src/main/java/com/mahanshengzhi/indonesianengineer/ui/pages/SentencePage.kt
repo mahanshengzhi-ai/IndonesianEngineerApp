@@ -56,9 +56,11 @@ class SentencePage(
         content.addView(UiKit.body(activity, sentence.example, 15f))
 
         val actions = UiKit.buttonRow(activity)
-        val audio = UiKit.secondaryButton(activity, "听发音")
-        audio.setOnClickListener { activity.playAudio(sentence.indonesian) }
-        UiKit.addWeightedButton(actions, audio, activity, 0.5f, 6)
+        if (activity.hasAudio(sentence.indonesian)) {
+            val audio = UiKit.secondaryButton(activity, "听发音")
+            audio.setOnClickListener { activity.playAudio(sentence.indonesian) }
+            UiKit.addWeightedButton(actions, audio, activity, 0.5f, 6)
+        }
 
         val know = UiKit.primaryButton(activity, "我会了")
         know.setOnClickListener {
