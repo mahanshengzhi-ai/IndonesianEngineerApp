@@ -401,96 +401,100 @@ def main() -> int:
     cache_root.mkdir(parents=True, exist_ok=True)
 
     print("Required unique learning texts:", len(required_texts))
-    print("Querying Wikimedia Commons category:", CATEGORY)
-    files = fetch_category_files()
-    print("Current Commons category WAV files:", len(files))
+    dataset_zip_path = download_dataset_zip(cache_root)
 
     exact_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     supplemental_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
 
-    for item in files:
-        metadata = item.get("metadata", {})
-        license_name = metadata_value(metadata, "LicenseShortName")
-        if license_name not in CC0_NAMES:
-            continue
-
-        title = item["title"]
-        parsed = title_transcription_candidates(title)
-
-        matched_text = None
-        for candidate_text in parsed:
-            key = normalize_text(candidate_text)
-            if key in required_map:
-                matched_text = required_map[key]
-                break
-
-        source_url = "https://commons.wikimedia.org/wiki/" + urllib.parse.quote(
-            title.replace(" ", "_"), safe="/:(),"
-        )
-        candidate = {
-            "title": title,
-            "url": item["url"],
-            "source_url": source_url,
-            "target_text": matched_text or parsed[-1],
-            "cache_path": str(
-                cache_root / (
-                    hashlib.sha1(title.encode("utf-8")).hexdigest() + ".wav"
-                )
-            ),
-        }
-
-        if matched_text is not None:
-            exact_candidates[normalize_text(matched_text)].append(candidate)
-        else:
-            transcript = parsed[-1] if parsed else ""
-            if normalize_text(transcript):
-                supplemental_candidates[normalize_text(transcript)].append(candidate)
-
-    selected: list[dict[str, Any]] = []
-    used_keys: set[str] = set()
-
-    for key in sorted(exact_candidates):
-        options = sorted(exact_candidates[key], key=lambda value: value["title"])
-        selected.append(options[0])
-        used_keys.add(key)
-
-    exact_learning_matches = len(selected)
-    print("Exact learning-text audio matches:", exact_learning_matches)
-
-    for key in sorted(supplemental_candidates):
-        if len(selected) >= args.min_lines:
-            break
-        if key in used_keys:
-            continue
-        options = sorted(supplemental_candidates[key], key=lambda value: value["title"])
-        selected.append(options[0])
-        used_keys.add(key)
-
-    if len(selected) < args.min_lines:
-        report = {
-            "status": "FAIL",
-            "required_learning_texts": len(required_texts),
-            "exact_learning_audio_matches": exact_learning_matches,
-            "audio_lines": len(selected),
-            "minimum_audio_lines": args.min_lines,
-            "candidate_category_files": len(files),
-            "message": "Not enough unique CC0 Indonesian recordings to reach the audio floor.",
-        }
-        path = root / "build" / "audio" / "audio_build_report.json"
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-        print(json.dumps(report, ensure_ascii=False, indent=2))
-        return 2
-
-    selected = selected[:args.max_lines]
-
-    assets = root / "app" / "src" / "main" / "assets"
-    assets.mkdir(parents=True, exist_ok=True)
-    audio_path = assets / "tts_audio.m4a"
-    index_path = assets / "tts_index.tsv"
-
-    dataset_zip_path = download_dataset_zip(cache_root)
     with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
+        wav_members = [
+            member for member in dataset_zip.namelist()
+            if member.lower().endswith(".wav")
+        ]
+        print("Lingua Libre dataset WAV members:", len(wav_members))
+
+        for member in wav_members:
+            title = Path(member).name
+            parsed = title_transcription_candidates("File:" + title)
+            if not parsed:
+                continue
+
+            matched_text = None
+            for candidate_text in parsed:
+                key = normalize_text(candidate_text)
+                if key in required_map:
+                    matched_text = required_map[key]
+                    break
+
+            transcript = matched_text or parsed[-1]
+            transcript_key = normalize_text(transcript)
+            if not transcript_key:
+                continue
+
+            source_url = "https://commons.wikimedia.org/wiki/File:" + urllib.parse.quote(
+                title.replace(" ", "_"), safe="/:(),"
+            )
+            candidate = {
+                "title": title,
+                "url": "",
+                "source_url": source_url,
+                "target_text": transcript,
+            }
+
+            if matched_text is not None:
+                exact_candidates[normalize_text(matched_text)].append(candidate)
+            else:
+                supplemental_candidates[transcript_key].append(candidate)
+
+        selected: list[dict[str, Any]] = []
+        used_keys: set[str] = set()
+
+        for key in sorted(exact_candidates):
+            options = sorted(exact_candidates[key], key=lambda value: value["title"])
+            selected.append(options[0])
+            used_keys.add(key)
+
+        exact_learning_matches = len(selected)
+        print("Exact learning-text audio matches:", exact_learning_matches)
+
+        for key in sorted(supplemental_candidates):
+            if len(selected) >= args.min_lines:
+                break
+            if key in used_keys:
+                continue
+            options = sorted(
+                supplemental_candidates[key],
+                key=lambda value: value["title"]
+            )
+            selected.append(options[0])
+            used_keys.add(key)
+
+        if len(selected) < args.min_lines:
+            report = {
+                "status": "FAIL",
+                "required_learning_texts": len(required_texts),
+                "exact_learning_audio_matches": exact_learning_matches,
+                "audio_lines": len(selected),
+                "minimum_audio_lines": args.min_lines,
+                "dataset_wav_members": len(wav_members),
+                "message": "The official Lingua Libre Indonesian dataset did not contain enough unique recordings.",
+            }
+            path = root / "build" / "audio" / "audio_build_report.json"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(
+                json.dumps(report, ensure_ascii=False, indent=2),
+                encoding="utf-8",
+            )
+            print(json.dumps(report, ensure_ascii=False, indent=2))
+            return 2
+
+        selected = selected[:args.max_lines]
+
+        assets = root / "app" / "src" / "main" / "assets"
+        assets.mkdir(parents=True, exist_ok=True)
+        audio_path = assets / "tts_audio.m4a"
+        index_path = assets / "tts_index.tsv"
+
         with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
             rows = make_concat_audio(
                 selected,
@@ -503,13 +507,14 @@ def main() -> int:
 
     report = {
         "status": "PASS",
-        "source": "Wikimedia Commons / Lingua Libre pronunciation-ind",
-        "source_category_files": len(files),
+        "source": "Lingua Libre Indonesian dataset Q305-ind-Indonesian",
+        "source_dataset_url": DATASET_URL,
         "required_learning_texts": len(required_texts),
         "exact_learning_audio_matches": exact_learning_matches,
         "learning_audio_coverage_pct": round(
             exact_learning_matches * 100 / max(1, len(required_texts)), 2
         ),
+        "dataset_wav_members": len(wav_members),
         "audio_lines": len(rows),
         "pause_ms": PAUSE_MS,
         "minimum_audio_lines": args.min_lines,
