@@ -1,9 +1,41 @@
 id	indonesian	chinese	scene	explanation	example
-S01	Saya sudah memeriksa gambar ini.	我已经检查过这张图纸了。	图纸确认	sudah 表示已经发生或完成的动作	Saya sudah memeriksa gambar ini.
+S01	Saya sudah memeriksa gambar ini.	我已经检查过这张图纸了。	图纸确认	sudah 表示动作已经完成	Saya sudah memeriksa gambar ini.
 S02	Tolong cek ukuran ini.	请检查一下这个尺寸。	测量放样	tolong 用于礼貌请求	Tolong cek ukuran ini.
 S03	Kita mulai pekerjaan setelah material datang.	材料到场后我们开始施工。	材料进场	setelah 表示在某事之后	Kita mulai pekerjaan setelah material datang.
-S04	Ada masalah di sini.	这里有一个问题。	质量检查	ada 表示“有、存在”	Ada masalah di sini.
-S05	Hati-hati, area ini masih berbahaya.	小心，这个区域仍然危险。	安全交底	hati-hati 用于提醒注意安全	Hati-hati, area ini masih berbahaya.
+S04	Ada masalah di sini.	这里有一个问题。	质量检查	ada 表示有或存在	Ada masalah di sini.
+S05	Hati-hati, area ini masih berbahaya.	小心，这个区域仍然危险。	安全交底	hati-hati 用于安全提醒	Hati-hati, area ini masih berbahaya.
 S06	Bisa ulangi sekali lagi?	可以再说一遍吗？	现场沟通	bisa 表示能够、可以	Bisa ulangi sekali lagi?
-S07	Menurut saya, ukuran ini terlalu kecil.	我觉得这个尺寸太小了。	图纸确认	menurut saya 表示“在我看来”	Menurut saya, ukuran ini terlalu kecil.
+S07	Menurut saya, ukuran ini terlalu kecil.	我觉得这个尺寸太小了。	图纸确认	menurut saya 表示在我看来	Menurut saya, ukuran ini terlalu kecil.
 S08	Kapan pekerjaan ini selesai?	这项工作什么时候完成？	进度沟通	kapan 用于询问时间	Kapan pekerjaan ini selesai?
+S09	Material ini sesuai spesifikasi.	这个材料符合规格。	材料验收	sesuai 表示符合	Material ini sesuai spesifikasi.
+S10	Berapa jumlah yang sudah datang?	已经到场多少数量？	材料进场	berapa 用于询问数量	Berapa jumlah yang sudah datang?
+S11	Tolong tunjukkan titik referensinya.	请指出基准点。	测量放样	tunjukkan 用于请求对方指出位置	Tolong tunjukkan titik referensinya.
+S12	Koordinat ini belum benar.	这个坐标还不正确。	测量放样	belum 表示尚未	Koordinat ini belum benar.
+S13	Kita perlu mengukur ulang.	我们需要重新测量。	测量放样	perlu 表示需要	Kita perlu mengukur ulang.
+S14	Jangan masuk sebelum pemeriksaan selesai.	检查完成前不要进入。	安全交底	jangan 表示禁止做某事	Jangan masuk sebelum pemeriksaan selesai.
+S15	Pak, bisa tolong tunggu sebentar?	师傅/先生，可以请您等一下吗？	现场沟通	bisa tolong 是常用礼貌请求	Pak, bisa tolong tunggu sebentar?
+S16	Saya akan cek dulu.	我先检查一下。	质量检查	akan 表示将要	Saya akan cek dulu.
+S17	Setelah itu kita lanjut bekerja.	之后我们继续工作。	施工	setelah itu 表示之后	Setelah itu kita lanjut bekerja.
+S18	Bagian ini harus diperbaiki.	这一部分必须修复。	质量整改	harus 表示必须	Bagian ini harus diperbaiki.
+S19	Jangan lupa pasang pengaman.	别忘了安装防护装置。	安全交底	jangan lupa 表示别忘了	Jangan lupa pasang pengaman.
+S20	Apakah gambar ini revisi terbaru?	这张图是最新版本吗？	图纸确认	apakah 用于一般疑问句	Apakah gambar ini revisi terbaru?
+S21	Versi sebelumnya sudah tidak dipakai.	之前的版本已经不用了。	图纸确认	sebelumnya 表示之前	Versi sebelumnya sudah tidak dipakai.
+S22	Tolong kirim foto hasil pekerjaan.	请发一下施工结果的照片。	现场沟通	tolong + 动词 是礼貌请求	Tolong kirim foto hasil pekerjaan.
+S23	Cuaca hari ini cukup panas.	今天的天气比较热。	现场沟通	cukup 表示相当、比较	Cuaca hari ini cukup panas.
+S24	Kita hentikan pekerjaan saat hujan deras.	下大雨时我们暂停施工。	安全交底	saat 表示在某个时间	Kita hentikan pekerjaan saat hujan deras.
+S25	Apakah beton sudah siap dicor?	混凝土已经准备好浇筑了吗？	混凝土浇筑	sudah 表示动作已经完成	Apakah beton sudah siap dicor?
+S26	Kualitas beton harus diperiksa.	混凝土质量必须检查。	质量检查	harus 强调要求	Kualitas beton harus diperiksa.
+S27	Berapa elevasi titik ini?	这个点的高程是多少？	测量放样	elevasi 表示高程	Berapa elevasi titik ini?
+S28	Tolong catat hasil pengukuran.	请记录测量结果。	测量放样	catat 表示记录	Tolong catat hasil pengukuran.
+S29	Pekerjaan hari ini sudah selesai.	今天的工作已经完成。	日报会议	hari ini 表示今天	Pekerjaan hari ini sudah selesai.
+S30	Besok kita mulai lebih pagi.	明天我们早点开始。	进度沟通	besok 表示明天	Besok kita mulai lebih pagi.
+S31	Kapan material berikutnya datang?	下一批材料什么时候到？	材料进场	berikutnya 表示下一批或下一项	Kapan material berikutnya datang?
+S32	Tolong simpan material di tempat yang kering.	请把材料放在干燥的地方。	材料进场	tempat 表示地点	Tolong simpan material di tempat yang kering.
+S33	Saya tidak menemukan titik ini di gambar.	我在图纸上找不到这个点。	图纸确认	menemukan 表示找到	Saya tidak menemukan titik ini di gambar.
+S34	Mari kita periksa bersama.	我们一起检查吧。	现场沟通	mari 表示一起做某事	Mari kita periksa bersama.
+S35	Saya setuju dengan perubahan ini.	我同意这项修改。	会议	setuju 表示同意	Saya setuju dengan perubahan ini.
+S36	Ada perubahan pada ukuran kolom.	柱子的尺寸有变化。	图纸确认	perubahan 表示变化、修改	Ada perubahan pada ukuran kolom.
+S37	Kita perlu mengatur jadwal lagi.	我们需要重新调整计划。	进度沟通	mengatur 表示安排、调整	Kita perlu mengatur jadwal lagi.
+S38	Tolong jelaskan bagian ini.	请说明一下这一部分。	图纸确认	jelaskan 表示解释	Tolong jelaskan bagian ini.
+S39	Apakah aman untuk mulai sekarang?	现在开始安全吗？	安全交底	aman 表示安全	Apakah aman untuk mulai sekarang?
+S40	Baik, saya mengerti.	好的，我明白了。	现场沟通	saya mengerti 表示我明白了	Baik, saya mengerti.
