@@ -41,6 +41,8 @@ jobs:
       - name: Install audio build tools
         if: steps.audio-cache.outputs.cache-hit != 'true'
         run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
           python3 -m pip install --disable-pip-version-check --no-input edge-tts==7.2.8 mutagen
           ffmpeg -version | head -n 1
 
