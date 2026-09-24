@@ -25,6 +25,8 @@ android {
 
     buildTypes {
         release {
+            // A locally signed release is required because the user needs an directly installable APK.
+            signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(
