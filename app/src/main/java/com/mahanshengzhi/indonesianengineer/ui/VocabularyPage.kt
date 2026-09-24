@@ -23,7 +23,7 @@ object VocabularyPage {
             setPadding(0, Ui.dp(context, 7), 0, Ui.dp(context, 14))
         })
 
-        val source = repository.vocabulary().take(80).toList()
+        val source = repository.vocabulary().toList()
         val search = EditText(context).apply {
             hint = "搜索：beton / 混凝土 / 材料"
             singleLine = true
