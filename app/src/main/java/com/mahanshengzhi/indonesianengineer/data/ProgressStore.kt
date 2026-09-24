@@ -32,6 +32,9 @@ class ProgressStore(context: Context) {
     fun markDailyScene() = increment("daily_scene_" + today())
     fun dailyScene(): Int = prefs.getInt("daily_scene_" + today(), 0)
 
+    fun markDailyFlashcard() = increment("daily_flashcards_" + today())
+    fun dailyFlashcards(): Int = prefs.getInt("daily_flashcards_" + today(), 0)
+
     fun incrementAudio() = increment("daily_audio_" + today())
     fun incrementQuiz() = increment("daily_quiz_" + today())
     fun incrementTranslation() = increment("daily_translate_" + today())
