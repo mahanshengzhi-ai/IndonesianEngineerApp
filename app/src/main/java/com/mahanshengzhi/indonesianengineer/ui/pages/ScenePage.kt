@@ -112,11 +112,13 @@ class ScenePage(
         content.addView(chinese)
 
         val actions = UiKit.buttonRow(activity)
-        val listen = UiKit.secondaryButton(activity, "播放")
+        val hasAudio = activity.hasAudio(line.indonesian)
+        val listen = UiKit.secondaryButton(activity, if (hasAudio) "播放" else "暂无内置语音")
+        listen.isEnabled = hasAudio
         val reveal = UiKit.secondaryButton(activity, "看中文")
 
         listen.setOnClickListener {
-            activity.playAudio(line.indonesian)
+            if (hasAudio) activity.playAudio(line.indonesian)
         }
 
         reveal.setOnClickListener {
