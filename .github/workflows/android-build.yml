@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: android-build-main-v9
+  group: android-build-main-v10
   cancel-in-progress: true
 
 jobs:
@@ -24,9 +24,13 @@ jobs:
 
       - name: Prepare audio tools
         run: |
-          sudo apt-get update
-          sudo apt-get install -y ffmpeg
-          python3 -m pip install --user requests
+          python3 -m pip install --user requests imageio-ffmpeg==0.6.0
+          python3 - <<'PY'
+          import os
+          import imageio_ffmpeg
+          ffmpeg_path = imageio_ffmpeg.get_ffmpeg_exe()
+          print(os.path.dirname(ffmpeg_path) >> open(os.environ["GITHUB_PATH"], "a"))
+          PY
 
       - name: Restore audio build cache
         uses: actions/cache@v5
