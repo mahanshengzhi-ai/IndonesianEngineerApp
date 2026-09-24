@@ -21,8 +21,8 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app" / "src" / "main" / "assets"
 API_URL = "https://commons.wikimedia.org/w/api.php"
 CATEGORY = "Category:Lingua Libre pronunciation-ind"
-UA = "IndonesianEngineerApp/0.7 (redistributable human-recorded audio build)"
-MAX_AUDIO = 3730
+UA = "IndonesianEngineerApp/0.8 (redistributable human-recorded audio build; contactable user agent)"
+MAX_AUDIO = 4000
 DOWNLOAD_WORKERS = 8
 CACHE_DIR = Path(os.environ.get("AUDIO_CACHE_DIR", "/tmp/indonesian-engineer-audio-cache"))
 
@@ -114,33 +114,86 @@ def get_json(session: requests.Session, params: dict[str, str | int]) -> dict:
     raise RuntimeError("request retry loop exhausted")
 
 
-def list_category_files(session: requests.Session) -> list[str]:
-    titles: list[str] = []
+
+def list_category_metadata(
+    session: requests.Session,
+    desired_keys: set[str],
+    desired_tokens: set[str],
+) -> dict[str, dict[str, str]]:
+    """
+    Fetch category members together with image metadata in one API query family.
+    We keep only recordings whose transcript is relevant to the requested text
+    or to a word token needed by a stitched phrase.
+    """
+    output: dict[str, dict[str, str]] = {}
     cont: dict[str, str] = {}
+
     while True:
-        data = get_json(
-            session,
-            {
-                "action": "query",
-                "format": "json",
-                "list": "categorymembers",
-                "cmtitle": CATEGORY,
-                "cmnamespace": "6",
-                "cmtype": "file",
-                "cmlimit": 500,
-                **cont,
-            },
-        )
-        titles.extend(
-            item["title"]
-            for item in data.get("query", {}).get("categorymembers", [])
-            if item.get("title", "").lower().endswith(".wav")
-        )
+        params: dict[str, str | int] = {
+            "action": "query",
+            "format": "json",
+            "generator": "categorymembers",
+            "gcmtitle": CATEGORY,
+            "gcmnamespace": "6",
+            "gcmtype": "file",
+            "gcmlimit": 500,
+            "prop": "imageinfo",
+            "iiprop": "url|extmetadata",
+            **cont,
+        }
+        data = get_json(session, params)
+        pages = data.get("query", {}).get("pages", {})
+
+        for page in pages.values():
+            title = page.get("title", "")
+            if not title.lower().endswith(".wav"):
+                continue
+
+            candidate_keys = {
+                normalize(candidate)
+                for candidate in transcription_candidates(title)
+                if normalize(candidate)
+            }
+            if not (candidate_keys & desired_keys) and not (candidate_keys & desired_tokens):
+                continue
+
+            infos = page.get("imageinfo", [])
+            if not infos:
+                continue
+
+            info = infos[0]
+            meta = info.get("extmetadata", {})
+            license_name = clean_html(
+                meta.get("LicenseShortName", {}).get("value", "")
+            )
+            if not license_allowed(license_name):
+                continue
+
+            url = info.get("url", "")
+            if not url:
+                continue
+
+            source_url = (
+                f"https://commons.wikimedia.org/wiki/{quote(title.replace(' ', '_'))}"
+            )
+            artist = clean_html(
+                meta.get("Artist", {}).get("value", "")
+                or meta.get("Credit", {}).get("value", "")
+                or "Unknown"
+            )
+            output[title] = {
+                "url": url,
+                "license": license_name,
+                "artist": artist,
+                "source_url": source_url,
+            }
+
         if "continue" not in data:
             break
         cont = data["continue"]
-        time.sleep(2.0)
-    return titles
+        time.sleep(0.8)
+
+    return output
 
 
 def transcription_candidates(title: str) -> list[str]:
@@ -181,57 +234,6 @@ def license_allowed(raw_name: str) -> bool:
     if any(marker in clean for marker in DENIED_LICENSE_MARKERS):
         return False
     return any(marker in clean for marker in ALLOWED_LICENSES)
-
-
-def metadata_for_titles(
-    session: requests.Session,
-    titles: list[str],
-) -> dict[str, dict[str, str]]:
-    output: dict[str, dict[str, str]] = {}
-    for start in range(0, len(titles), 50):
-        batch = titles[start:start + 50]
-        data = get_json(
-            session,
-            {
-                "action": "query",
-                "format": "json",
-                "prop": "imageinfo",
-                "iiprop": "url|extmetadata",
-                "titles": "|".join(batch),
-            },
-        )
-        for page in data.get("query", {}).get("pages", {}).values():
-            title = page.get("title", "")
-            infos = page.get("imageinfo", [])
-            if not infos:
-                continue
-
-            info = infos[0]
-            meta = info.get("extmetadata", {})
-            license_name = clean_html(
-                meta.get("LicenseShortName", {}).get("value", "")
-            )
-            if not license_allowed(license_name):
-                continue
-
-            source_url = (
-                f"https://commons.wikimedia.org/wiki/{quote(title.replace(' ', '_'))}"
-            )
-            artist = clean_html(
-                meta.get("Artist", {}).get("value", "")
-                or meta.get("Credit", {}).get("value", "")
-                or "Unknown"
-            )
-            url = info.get("url", "")
-            if url:
-                output[title] = {
-                    "url": url,
-                    "license": license_name,
-                    "artist": artist,
-                    "source_url": source_url,
-                }
-        time.sleep(0.25)
-    return output
 
 
 def tokenize_phrase(text: str) -> list[str]:
@@ -389,19 +391,20 @@ def main() -> None:
     session = requests.Session()
     session.headers["User-Agent"] = UA
 
-    titles = list_category_files(session)
-    print("CATEGORY_FILES =", len(titles))
+    desired_keys = {normalize(text) for text in desired}
+    desired_tokens = {
+        token
+        for text in desired
+        for token in tokenize_phrase(text)
+        if token
+    }
+
+    metadata = list_category_metadata(session, desired_keys, desired_tokens)
+    print("REDISTRIBUTABLE_RELEVANT_FILES =", len(metadata))
+
+    titles = sorted(metadata)
     title_index = build_title_index(titles)
-
-    candidate_titles: set[str] = set()
-    for text in desired:
-        candidate_titles.update(title_index.get(normalize(text), []))
-        for token in tokenize_phrase(text):
-            candidate_titles.update(title_index.get(token, []))
-
-    print("UNIQUE_CANDIDATE_FILES =", len(candidate_titles))
-    metadata = metadata_for_titles(session, sorted(candidate_titles))
-    print("REDISTRIBUTABLE_CANDIDATE_FILES =", len(metadata))
+    print("RELEVANT_CATEGORY_FILES =", len(titles))
 
     resolved = resolve_audio_plans(desired, title_index, metadata)
     print("RESOLVED_AUDIO_TEXTS =", len(resolved))
