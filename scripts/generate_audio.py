@@ -156,7 +156,7 @@ def main() -> None:
             duration_ms,
             item.text,
             item.source,
-            "BUILD_TIME_VOICE_UNVERIFIED",
+            "BUILD_TIME_SYNTHETIC_VOICE",
         ))
         list_lines.append(f"file {shlex.quote(path.as_posix())}")
         list_lines.append(f"file {shlex.quote(silence.as_posix())}")
