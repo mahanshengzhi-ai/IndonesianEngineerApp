@@ -21,7 +21,7 @@ ASSETS = ROOT / "app" / "src" / "main" / "assets"
 API_URL = "https://commons.wikimedia.org/w/api.php"
 CATEGORY = "Category:Lingua Libre pronunciation-ind"
 UA = "IndonesianEngineerApp/0.4 (open-source pronunciation audio build; contact: mahanshengzhi-ai)"
-MAX_AUDIO = 3704
+MAX_AUDIO = 3000
 DOWNLOAD_WORKERS = 4
 
 
@@ -292,7 +292,7 @@ def main() -> None:
 
         with ThreadPoolExecutor(max_workers=DOWNLOAD_WORKERS) as executor:
             futures = [
-                executor.submit(session_factory and download_one, session_factory, item, temp_root)
+                executor.submit(download_one, session_factory, item, temp_root)
                 for item in selected
             ]
             ordered_results: dict[int, tuple[str, Path, str]] = {}
