@@ -12,8 +12,6 @@ class AudioPlayer(context: Context) {
     private val appContext = context.applicationContext
     private var player: ExoPlayer? = null
     private val index = AudioIndex(appContext)
-    private var currentText = ""
-    private var currentSpeed = 1.0f
 
     fun hasAudio(text: String): Boolean = index.find(text) != null
 
@@ -38,37 +36,33 @@ class AudioPlayer(context: Context) {
         if (player == null) {
             player = ExoPlayer.Builder(appContext).build()
         }
-
-        currentText = segment.originalText
         player?.setMediaItem(item)
         player?.prepare()
-        player?.playbackParameters = PlaybackParameters(currentSpeed)
         player?.play()
         return true
+    }
+
+    fun playOrPause() {
+        player?.let {
+            if (it.isPlaying) it.pause() else it.play()
+        }
     }
 
     fun pause() {
         player?.pause()
     }
 
-    fun resume() {
-        player?.play()
+    fun setSpeed(speed: Float) {
+        player?.playbackParameters = PlaybackParameters(speed.coerceIn(0.8f, 1.0f))
     }
 
     fun seekTo(positionMs: Long) {
         player?.seekTo(positionMs.coerceAtLeast(0L))
     }
 
-    fun setSpeed(speed: Float) {
-        currentSpeed = speed.coerceIn(0.8f, 1.0f)
-        player?.playbackParameters = PlaybackParameters(currentSpeed)
-    }
-
-    fun speed(): Float = currentSpeed
-    fun currentText(): String = currentText
     fun isPlaying(): Boolean = player?.isPlaying == true
-    fun positionMs(): Long = player?.currentPosition?.coerceAtLeast(0L) ?: 0L
-    fun durationMs(): Long = player?.duration?.takeIf { it > 0L } ?: 0L
+    fun currentPosition(): Long = player?.currentPosition ?: 0L
+    fun duration(): Long = player?.duration?.takeIf { it > 0L } ?: 0L
 
     fun release() {
         player?.release()
