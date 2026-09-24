@@ -5,6 +5,7 @@ import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import androidx.core.content.ContextCompat
+import androidx.media3.common.util.UnstableApi
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.mahanshengzhi.indonesianengineer.R
@@ -14,6 +15,7 @@ import android.app.Activity
 import android.os.Handler
 import android.os.Looper
 
+@OptIn(UnstableApi::class)
 class MiniPlayerController(
     private val activity: Activity,
     private val container: ViewGroup,
