@@ -42,7 +42,7 @@ CC0_NAMES = {"CC0 1.0", "CC0 1.0 Universal", "Public domain"}
 USER_AGENT = "IndonesianEngineerApp/0.7 audio-builder"
 PAUSE_MS = 120
 TARGET_LINES = 3000
-MAX_LINES = 3200
+MAX_LINES = 3000
 DATASET_URL = "https://lingualibre.org/datasets/Q305-ind-Indonesian.zip"
 
 
@@ -412,9 +412,15 @@ def main() -> int:
     cache_root.mkdir(parents=True, exist_ok=True)
 
     print("Required unique learning texts:", len(required_texts))
+    print("Downloading Lingua Libre Indonesian dataset...")
+    dataset_zip_path = download_dataset_zip(cache_root)
+    with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
+        zip_names = build_zip_name_map(dataset_zip)
+
     print("Querying Wikimedia Commons category:", CATEGORY)
     files = fetch_category_files()
-    print("Candidate CC0 category files:", len(files))
+    files = [item for item in files if item["title"] in zip_names]
+    print("Current Commons files also present in dataset:", len(files))
 
     exact_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     supplemental_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -500,7 +506,6 @@ def main() -> int:
     audio_path = assets / "tts_audio.m4a"
     index_path = assets / "tts_index.tsv"
 
-    dataset_zip_path = download_dataset_zip(cache_root)
     with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
         with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
             rows = make_concat_audio(
