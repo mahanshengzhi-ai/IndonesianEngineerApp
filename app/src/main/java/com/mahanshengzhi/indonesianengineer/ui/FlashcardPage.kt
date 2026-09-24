@@ -44,7 +44,7 @@ object FlashcardPage {
             render()
         }
 
-        render = {
+        render = render@{
             content.removeAllViews()
 
             if (current >= source.size) {
@@ -66,7 +66,7 @@ object FlashcardPage {
                 }
                 result.addView(Ui.button(context, "完成复习") { onFinish() })
                 content.addView(Ui.card(context, result))
-                return
+                return@render
             }
 
             val word = source[current]
