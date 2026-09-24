@@ -1,1 +1,326 @@
-id\tindonesian\tchinese\tcategory\tscene\texample\texample_chinese\nW0010\tposisi pekerjaan konstruksi\t施工位置\t施工\t施工\t\t\nW0021\tpemeriksaan akhir pekerjaan konstruksi\t施工最终检查\t施工\t施工\t\t\nW0032\tkondisi proyek\t项目状态\t项目管理\t项目管理\t\t\nW0043\tspesifikasi proyek\t项目规格\t项目管理\t项目管理\t\t\nW0054\tpemeliharaan lapangan\t维护现场\t现场管理\t现场管理\t\t\nW0065\tbiaya lapangan\t现场费用\t现场管理\t现场管理\t\t\nW0076\tpemasangan lokasi konstruksi\t安装工地\t现场管理\t现场管理\t\t\nW0087\tcatatan lokasi konstruksi\t工地记录\t现场管理\t现场管理\t\t\nW0098\tpemeriksaan proyek teknik\t检查工程\t项目管理\t项目管理\t\t\nW0109\tdata proyek teknik\t工程数据\t项目管理\t项目管理\t\t\nW0120\tproyek teknik sementara\t临时工程\t项目管理\t项目管理\t\t\nW0131\tukuran fondasi\t基础尺寸\t结构\t结构\t\t\nW0142\trisiko fondasi\t基础风险\t结构\t结构\t\t\nW0153\tlokasi tanah dasar\t地基位置\t土建\t土建\t\t\nW0164\tpersiapan tanah dasar\t地基准备\t土建\t土建\t\t\nW0175\tpekerjaan pekerjaan tanah\t土方作业\t土建\t土建\t\t\nW0186\tkualitas pekerjaan tanah\t土方质量\t土建\t土建\t\t\nW0197\tperbaikan galian fondasi\t修复基坑\t土建\t土建\t\t\nW0208\tjadwal galian fondasi\t基坑计划\t土建\t土建\t\t\nW0219\tpengukuran lereng\t测量边坡\t土建\t土建\t\t\nW0230\thasil lereng\t边坡结果\t土建\t土建\t\t\nW0241\tdinding penahan tanah\t挡土墙\t土建\t土建\t\t\nW0252\tgambar dinding penahan tanah\t挡土墙图纸\t土建\t土建\t\t\nW0263\tdinding penahan tanah utama\t主要挡土墙\t土建\t土建\t\t\nW0274\tposisi pagar\t围墙位置\t土建\t土建\t\t\nW0285\tpemeriksaan akhir pagar\t围墙最终检查\t土建\t土建\t\t\nW0296\tkondisi saluran drainase\t排水沟状态\t水利\t水利\t\t\nW0307\tspesifikasi saluran drainase\t排水沟规格\t水利\t水利\t\t\nW0318\tpemeliharaan sumur pengumpul\t维护集水井\t水利\t水利\t\t\nW0329\tbiaya sumur pengumpul\t集水井费用\t水利\t水利\t\t\nW0340\tpemasangan kolam sedimentasi\t安装沉淀池\t水利\t水利\t\t\nW0351\tcatatan kolam sedimentasi\t沉淀池记录\t水利\t水利\t\t\nW0362\tpemeriksaan beton\t检查混凝土\t材料\t材料\t\t\nW0373\tdata beton\t混凝土数据\t材料\t材料\t\t\nW0384\tbeton sementara\t临时混凝土\t材料\t材料\t\t\nW0395\tukuran semen\t水泥尺寸\t材料\t材料\t\t\nW0406\trisiko semen\t水泥风险\t材料\t材料\t\t\nW0417\tlokasi pasir\t砂位置\t材料\t材料\t\t\nW0428\tpersiapan pasir\t砂准备\t材料\t材料\t\t\nW0439\tpekerjaan batu pecah\t碎石作业\t材料\t材料\t\t\nW0450\tkualitas batu pecah\t碎石质量\t材料\t材料\t\t\nW0461\tperbaikan agregat\t修复骨料\t材料\t材料\t\t\nW0472\tjadwal agregat\t骨料计划\t材料\t材料\t\t\nW0483\tpengukuran tulangan\t测量钢筋\t钢筋\t钢筋\t\t\nW0494\thasil tulangan\t钢筋结果\t钢筋\t钢筋\t\t\nW0505\tkeranjang tulangan\t钢筋笼\t钢筋\t钢筋\t\t\nW0516\tgambar keranjang tulangan\t钢筋笼图纸\t钢筋\t钢筋\t\t\nW0527\tkeranjang tulangan utama\t主要钢筋笼\t钢筋\t钢筋\t\t\nW0538\tposisi sengkang\t箍筋位置\t钢筋\t钢筋\t\t\nW0549\tpemeriksaan akhir sengkang\t箍筋最终检查\t钢筋\t钢筋\t\t\nW0560\tkondisi tulangan pengikat\t拉筋状态\t钢筋\t钢筋\t\t\nW0571\tspesifikasi tulangan pengikat\t拉筋规格\t钢筋\t钢筋\t\t\nW0582\tpemeliharaan tulangan angkur\t维护锚筋\t钢筋\t钢筋\t\t\nW0593\tbiaya tulangan angkur\t锚筋费用\t钢筋\t钢筋\t\t\nW0604\tpemasangan baja profil\t安装型钢\t钢结构\t钢结构\t\t\nW0615\tcatatan baja profil\t型钢记录\t钢结构\t钢结构\t\t\nW0626\tpemeriksaan pelat baja\t检查钢板\t钢结构\t钢结构\t\t\nW0637\tdata pelat baja\t钢板数据\t钢结构\t钢结构\t\t\nW0648\tpelat baja sementara\t临时钢板\t钢结构\t钢结构\t\t\nW0659\tukuran baut\t螺栓尺寸\t钢结构\t钢结构\t\t\nW0670\trisiko baut\t螺栓风险\t钢结构\t钢结构\t\t\nW0681\tlokasi jahitan las\t焊缝位置\t钢结构\t钢结构\t\t\nW0692\tpersiapan jahitan las\t焊缝准备\t钢结构\t钢结构\t\t\nW0703\tpekerjaan pengelasan\t焊接作业\t钢结构\t钢结构\t\t\nW0714\tkualitas pengelasan\t焊接质量\t钢结构\t钢结构\t\t\nW0725\tperbaikan bekisting\t修复模板\t模板\t模板\t\t\nW0736\tjadwal bekisting\t模板计划\t模板\t模板\t\t\nW0747\tpengukuran bekisting kayu\t测量木模板\t模板\t模板\t\t\nW0758\thasil bekisting kayu\t木模板结果\t模板\t模板\t\t\nW0769\tbekisting baja\t钢模板\t模板\t模板\t\t\nW0780\tgambar bekisting baja\t钢模板图纸\t模板\t模板\t\t\nW0791\tbekisting baja utama\t主要钢模板\t模板\t模板\t\t\nW0802\tukuran pemasangan bekisting\t支模尺寸\t模板\t模板\t\t\nW0813\trisiko pemasangan bekisting\t支模风险\t模板\t模板\t\t\nW0824\tlokasi pembongkaran bekisting\t拆模位置\t模板\t模板\t\t\nW0835\tpersiapan pembongkaran bekisting\t拆模准备\t模板\t模板\t\t\nW0846\tpekerjaan perancah\t脚手架作业\t脚手架\t脚手架\t\t\nW0857\tkualitas perancah\t脚手架质量\t脚手架\t脚手架\t\t\nW0868\tperbaikan tiang vertikal\t修复立杆\t脚手架\t脚手架\t\t\nW0879\tjadwal tiang vertikal\t立杆计划\t脚手架\t脚手架\t\t\nW0890\tpengukuran batang horizontal\t测量横杆\t脚手架\t脚手架\t\t\nW0901\thasil batang horizontal\t横杆结果\t脚手架\t脚手架\t\t\nW0912\tpengaku diagonal\t剪刀撑\t脚手架\t脚手架\t\t\nW0923\tgambar pengaku diagonal\t剪刀撑图纸\t脚手架\t脚手架\t\t\nW0934\tpengaku diagonal utama\t主要剪刀撑\t脚手架\t脚手架\t\t\nW0945\tposisi papan perancah\t脚手板位置\t脚手架\t脚手架\t\t\nW0956\tpemeriksaan akhir papan perancah\t脚手板最终检查\t脚手架\t脚手架\t\t\nW0967\tkondisi pasangan dinding\t砌体状态\t砌筑\t砌筑\t\t\nW0978\tspesifikasi pasangan dinding\t砌体规格\t砌筑\t砌筑\t\t\nW0989\tpemeliharaan bata\t维护砖\t砌筑\t砌筑\t\t\nW1000\tbiaya bata\t砖费用\t砌筑\t砌筑\t\t\nW1011\tpemasangan blok beton\t安装砌块\t砌筑\t砌筑\t\t\nW1022\tcatatan blok beton\t砌块记录\t砌筑\t砌筑\t\t\nW1033\tpemeriksaan mortar\t检查砂浆\t砌筑\t砌筑\t\t\nW1044\tdata mortar\t砂浆数据\t砌筑\t砌筑\t\t\nW1055\tmortar sementara\t临时砂浆\t砌筑\t砌筑\t\t\nW1066\tukuran plesteran\t抹灰尺寸\t装修\t装修\t\t\nW1077\trisiko plesteran\t抹灰风险\t装修\t装修\t\t\nW1088\tlokasi lantai\t地面位置\t装修\t装修\t\t\nW1099\tpersiapan lantai\t地面准备\t装修\t装修\t\t\nW1110\tpekerjaan dinding\t墙面作业\t装修\t装修\t\t\nW1121\tkualitas dinding\t墙面质量\t装修\t装修\t\t\nW1132\tperbaikan plafon\t修复天花板\t装修\t装修\t\t\nW1143\tjadwal plafon\t天花板计划\t装修\t装修\t\t\nW1154\tpengukuran pintu dan jendela\t测量门窗\t装修\t装修\t\t\nW1165\thasil pintu dan jendela\t门窗结果\t装修\t装修\t\t\nW1176\tlapisan kedap air\t防水层\t防水\t防水\t\t\nW1187\tgambar lapisan kedap air\t防水层图纸\t防水\t防水\t\t\nW1198\tlapisan kedap air utama\t主要防水层\t防水\t防水\t\t\nW1209\tposisi pipa\t管道位置\t管道\t管道\t\t\nW1220\tpemeriksaan akhir pipa\t管道最终检查\t管道\t管道\t\t\nW1231\tkondisi pipa air bersih\t给水管状态\t管道\t管道\t\t\nW1242\tspesifikasi pipa air bersih\t给水管规格\t管道\t管道\t\t\nW1253\tpemeliharaan pipa drainase\t维护排水管\t管道\t管道\t\t\nW1264\tbiaya pipa drainase\t排水管费用\t管道\t管道\t\t\nW1275\tpemasangan pipa bertekanan\t安装压力管\t管道\t管道\t\t\nW1286\tcatatan pipa bertekanan\t压力管记录\t管道\t管道\t\t\nW1297\tpemeriksaan katup\t检查阀门\t管道\t管道\t\t\nW1308\tdata katup\t阀门数据\t管道\t管道\t\t\nW1319\tkatup sementara\t临时阀门\t管道\t管道\t\t\nW1330\tukuran flensa\t法兰尺寸\t管道\t管道\t\t\nW1341\trisiko flensa\t法兰风险\t管道\t管道\t\t\nW1352\tlokasi elbow\t弯头位置\t管道\t管道\t\t\nW1363\tpersiapan elbow\t弯头准备\t管道\t管道\t\t\nW1374\tpekerjaan tee\t三通作业\t管道\t管道\t\t\nW1385\tkualitas tee\t三通质量\t管道\t管道\t\t\nW1396\tperbaikan sambungan\t修复接头\t管道\t管道\t\t\nW1407\tjadwal sambungan\t接头计划\t管道\t管道\t\t\nW1418\tpengukuran pompa air\t测量水泵\t水利\t水利\t\t\nW1429\thasil pompa air\t水泵结果\t水利\t水利\t\t\nW1440\ttangki air\t水箱\t水利\t水利\t\t\nW1451\tgambar tangki air\t水箱图纸\t水利\t水利\t\t\nW1462\ttangki air utama\t主要水箱\t水利\t水利\t\t\nW1473\tposisi sprinkler\t喷头位置\t灌溉\t灌溉\t\t\nW1484\tpemeriksaan akhir sprinkler\t喷头最终检查\t灌溉\t灌溉\t\t\nW1495\tkondisi pita irigasi tetes\t滴灌带状态\t灌溉\t灌溉\t\t\nW1506\tspesifikasi pita irigasi tetes\t滴灌带规格\t灌溉\t灌溉\t\t\nW1517\tpemeliharaan filter\t维护过滤器\t灌溉\t灌溉\t\t\nW1528\tbiaya filter\t过滤器费用\t灌溉\t灌溉\t\t\nW1539\tpemasangan katup pengurang tekanan\t安装减压阀\t灌溉\t灌溉\t\t\nW1550\tcatatan katup pengurang tekanan\t减压阀记录\t灌溉\t灌溉\t\t\nW1561\tpemeriksaan bak katup\t检查阀井\t水利\t水利\t\t\nW1572\tdata bak katup\t阀井数据\t水利\t水利\t\t\nW1583\tbak katup sementara\t临时阀井\t水利\t水利\t\t\nW1594\tukuran bangunan pengambilan\t取水口尺寸\t水利\t水利\t\t\nW1605\trisiko bangunan pengambilan\t取水口风险\t水利\t水利\t\t\nW1616\tlokasi bak penampung air\t蓄水池位置\t水利\t水利\t\t\nW1627\tpersiapan bak penampung air\t蓄水池准备\t水利\t水利\t\t\nW1638\tpekerjaan saluran\t渠道作业\t水利\t水利\t\t\nW1649\tkualitas saluran\t渠道质量\t水利\t水利\t\t\nW1660\tperbaikan pintu air\t修复闸门\t水利\t水利\t\t\nW1671\tjadwal pintu air\t闸门计划\t水利\t水利\t\t\nW1682\tpengukuran jalan\t测量道路\t道路\t道路\t\t\nW1693\thasil jalan\t道路结果\t道路\t道路\t\t\nW1704\tbadan jalan\t路基\t道路\t道路\t\t\nW1715\tgambar badan jalan\t路基图纸\t道路\t道路\t\t\nW1726\tbadan jalan utama\t主要路基\t道路\t道路\t\t\nW1737\tposisi permukaan jalan\t路面位置\t道路\t道路\t\t\nW1748\tpemeriksaan akhir permukaan jalan\t路面最终检查\t道路\t道路\t\t\nW1759\tkondisi aspal\t沥青状态\t道路\t道路\t\t\nW1770\tspesifikasi aspal\t沥青规格\t道路\t道路\t\t\nW1781\tpemeliharaan trotoar\t维护人行道\t道路\t道路\t\t\nW1792\tbiaya trotoar\t人行道费用\t道路\t道路\t\t\nW1803\tpemasangan kanstin\t安装路缘石\t道路\t道路\t\t\nW1814\tcatatan kanstin\t路缘石记录\t道路\t道路\t\t\nW1825\tpemeriksaan jembatan\t检查桥梁\t桥梁\t桥梁\t\t\nW1836\tdata jembatan\t桥梁数据\t桥梁\t桥梁\t\t\nW1847\tjembatan sementara\t临时桥梁\t桥梁\t桥梁\t\t\nW1858\tukuran abutmen\t桥台尺寸\t桥梁\t桥梁\t\t\nW1869\trisiko abutmen\t桥台风险\t桥梁\t桥梁\t\t\nW1880\tlokasi pilar jembatan\t桥墩位置\t桥梁\t桥梁\t\t\nW1891\tpersiapan pilar jembatan\t桥墩准备\t桥梁\t桥梁\t\t\nW1902\tpekerjaan balok dan pelat\t梁板作业\t桥梁\t桥梁\t\t\nW1913\tkualitas balok dan pelat\t梁板质量\t桥梁\t桥梁\t\t\nW1924\tperbaikan peralatan\t修复设备\t机械\t机械\t\t\nW1935\tjadwal peralatan\t设备计划\t机械\t机械\t\t\nW1946\tpengukuran mesin\t测量机械\t机械\t机械\t\t\nW1957\thasil mesin\t机械结果\t机械\t机械\t\t\nW1968\tekskavator\t挖掘机\t机械\t机械\t\t\nW1979\tgambar ekskavator\t挖掘机图纸\t机械\t机械\t\t\nW1990\tekskavator utama\t主要挖掘机\t机械\t机械\t\t\nW2001\tposisi loader\t装载机位置\t机械\t机械\t\t\nW2012\tpemeriksaan akhir loader\t装载机最终检查\t机械\t机械\t\t\nW2023\tkondisi mesin pemadat\t压路机状态\t机械\t机械\t\t\nW2034\tspesifikasi mesin pemadat\t压路机规格\t机械\t机械\t\t\nW2045\tpemeliharaan crane\t维护吊车\t机械\t机械\t\t\nW2056\tbiaya crane\t吊车费用\t机械\t机械\t\t\nW2067\tpemasangan mixer\t安装搅拌机\t机械\t机械\t\t\nW2078\tcatatan mixer\t搅拌机记录\t机械\t机械\t\t\nW2089\tpemeriksaan generator\t检查发电机\t机电\t机电\t\t\nW2100\tdata generator\t发电机数据\t机电\t机电\t\t\nW2111\tgenerator sementara\t临时发电机\t机电\t机电\t\t\nW2122\tukuran kompresor udara\t空压机尺寸\t机械\t机械\t\t\nW2133\trisiko kompresor udara\t空压机风险\t机械\t机械\t\t\nW2144\tlokasi mesin las\t焊机位置\t机电\t机电\t\t\nW2155\tpersiapan mesin las\t焊机准备\t机电\t机电\t\t\nW2166\tpekerjaan kabel\t电缆作业\t电气\t电气\t\t\nW2177\tkualitas kabel\t电缆质量\t电气\t电气\t\t\nW2188\tperbaikan kabel listrik\t修复电线\t电气\t电气\t\t\nW2199\tjadwal kabel listrik\t电线计划\t电气\t电气\t\t\nW2210\tpengukuran panel distribusi\t测量配电箱\t电气\t电气\t\t\nW2221\thasil panel distribusi\t配电箱结果\t电气\t电气\t\t\nW2232\tpemutus sirkuit\t断路器\t电气\t电气\t\t\nW2243\tgambar pemutus sirkuit\t断路器图纸\t电气\t电气\t\t\nW2254\tpemutus sirkuit utama\t主要断路器\t电气\t电气\t\t\nW2265\tposisi pembumian\t接地位置\t电气\t电气\t\t\nW2276\tpemeriksaan akhir pembumian\t接地最终检查\t电气\t电气\t\t\nW2287\tkondisi pencahayaan\t照明状态\t电气\t电气\t\t\nW2298\tspesifikasi pencahayaan\t照明规格\t电气\t电气\t\t\nW2309\tpemeliharaan stop kontak\t维护插座\t电气\t电气\t\t\nW2320\tbiaya stop kontak\t插座费用\t电气\t电气\t\t\nW2331\tpemasangan sakelar\t安装开关\t电气\t电气\t\t\nW2342\tcatatan sakelar\t开关记录\t电气\t电气\t\t\nW2353\tpemeriksaan panel kontrol\t检查控制柜\t电气\t电气\t\t\nW2364\tdata panel kontrol\t控制柜数据\t电气\t电气\t\t\nW2375\tpanel kontrol sementara\t临时控制柜\t电气\t电气\t\t\nW2386\tukuran motor listrik\t电机尺寸\t机电\t机电\t\t\nW2397\trisiko motor listrik\t电机风险\t机电\t机电\t\t\nW2408\tlokasi pengukuran\t测量位置\t测量\t测量\t\t\nW2419\tpersiapan pengukuran\t测量准备\t测量\t测量\t\t\nW2430\tpekerjaan total station\t全站仪作业\t测量\t测量\t\t\nW2441\tkualitas total station\t全站仪质量\t测量\t测量\t\t\nW2452\tperbaikan alat ukur nivo\t修复水准仪\t测量\t测量\t\t\nW2463\tjadwal alat ukur nivo\t水准仪计划\t测量\t测量\t\t\nW2474\tpengukuran prisma\t测量棱镜\t测量\t测量\t\t\nW2485\thasil prisma\t棱镜结果\t测量\t测量\t\t\nW2496\trambu ukur\t测杆\t测量\t测量\t\t\nW2507\tgambar rambu ukur\t测杆图纸\t测量\t测量\t\t\nW2518\trambu ukur utama\t主要测杆\t测量\t测量\t\t\nW2529\tposisi meteran\t卷尺位置\t测量\t测量\t\t\nW2540\tpemeriksaan akhir meteran\t卷尺最终检查\t测量\t测量\t\t\nW2551\tkondisi koordinat\t坐标状态\t测量\t测量\t\t\nW2562\tspesifikasi koordinat\t坐标规格\t测量\t测量\t\t\nW2573\tpemeliharaan elevasi\t维护高程\t测量\t测量\t\t\nW2584\tbiaya elevasi\t高程费用\t测量\t测量\t\t\nW2595\tpemasangan titik referensi\t安装基准点\t测量\t测量\t\t\nW2606\tcatatan titik referensi\t基准点记录\t测量\t测量\t\t\nW2617\tpemeriksaan titik kontrol\t检查控制点\t测量\t测量\t\t\nW2628\tdata titik kontrol\t控制点数据\t测量\t测量\t\t\nW2639\ttitik kontrol sementara\t临时控制点\t测量\t测量\t\t\nW2650\tukuran pematokan\t放样尺寸\t测量\t测量\t\t\nW2661\trisiko pematokan\t放样风险\t测量\t测量\t\t\nW2672\tlokasi penampang\t断面位置\t测量\t测量\t\t\nW2683\tpersiapan penampang\t断面准备\t测量\t测量\t\t\nW2694\tpekerjaan azimut\t方位角作业\t测量\t测量\t\t\nW2705\tkualitas azimut\t方位角质量\t测量\t测量\t\t\nW2716\tperbaikan jarak\t修复距离\t测量\t测量\t\t\nW2727\tjadwal jarak\t距离计划\t测量\t测量\t\t\nW2738\tpengukuran sudut\t测量角度\t测量\t测量\t\t\nW2749\thasil sudut\t角度结果\t测量\t测量\t\t\nW2760\tgambar kerja\t图纸\t技术\t技术\t\t\nW2771\tgambar gambar kerja\t图纸图纸\t技术\t技术\t\t\nW2782\tgambar kerja utama\t主要图纸\t技术\t技术\t\t\nW2793\tposisi gambar konstruksi\t施工图位置\t技术\t技术\t\t\nW2804\tpemeriksaan akhir gambar konstruksi\t施工图最终检查\t技术\t技术\t\t\nW2815\tkondisi gambar detail\t详图状态\t技术\t技术\t\t\nW2826\tspesifikasi gambar detail\t详图规格\t技术\t技术\t\t\nW2837\tpekerjaan gambar penampang\t剖面图作业\t技术\t技术\t\t\nW2848\tkualitas gambar penampang\t剖面图质量\t技术\t技术\t\t\nW2859\tperbaikan gambar denah\t修复平面图\t技术\t技术\t\t\nW2870\tjadwal gambar denah\t平面图计划\t技术\t技术\t\t\nW2881\tpengukuran detail titik\t测量节点\t技术\t技术\t\t\nW2892\thasil detail titik\t节点结果\t技术\t技术\t\t\nW2903\tukuran\t尺寸\t技术\t技术\t\t\nW2914\tgambar ukuran\t尺寸图纸\t技术\t技术\t\t\nW2925\tukuran utama\t主要尺寸\t技术\t技术\t\t\nW2936\tposisi simbol\t符号位置\t技术\t技术\t\t\nW2947\tpemeriksaan akhir simbol\t符号最终检查\t技术\t技术\t\t\nW2958\tkondisi revisi\t版本状态\t技术\t技术\t\t\nW2969\tspesifikasi revisi\t版本规格\t技术\t技术\t\t\nW2980\tpemeliharaan material\t维护材料\t材料\t材料\t\t\nW2991\tbiaya material\t材料费用\t材料\t材料\t\t\nW3002\tpemasangan batch\t安装批次\t材料管理\t材料管理\t\t\nW3013\tcatatan batch\t批次记录\t材料管理\t材料管理\t\t\nW3024\tpemeriksaan sampel\t检查样品\t质量\t质量\t\t\nW3035\tdata sampel\t样品数据\t质量\t质量\t\t\nW3046\tsampel sementara\t临时样品\t质量\t质量\t\t\nW3057\tukuran spesifikasi\t规格尺寸\t质量\t质量\t\t\nW3068\trisiko spesifikasi\t规格风险\t质量\t质量\t\t\nW3079\tlokasi jumlah\t数量位置\t材料管理\t材料管理\t\t\nW3090\tpersiapan jumlah\t数量准备\t材料管理\t材料管理\t\t\nW3101\tpekerjaan kualitas\t质量作业\t质量\t质量\t\t\nW3112\tkualitas kualitas\t质量质量\t质量\t质量\t\t\nW3123\tperbaikan pemeriksaan\t修复检验\t质量\t质量\t\t\nW3134\tjadwal pemeriksaan\t检验计划\t质量\t质量\t\t\nW3145\tpengukuran pengujian\t测量试验\t质量\t质量\t\t\nW3156\thasil pengujian\t试验结果\t质量\t质量\t\t\nW3167\tpengambilan sampel\t取样\t质量\t质量\t\t\nW3178\tgambar pengambilan sampel\t取样图纸\t质量\t质量\t\t\nW3189\tpengambilan sampel utama\t主要取样\t质量\t质量\t\t\nW3200\tposisi laporan\t报告位置\t质量\t质量\t\t\nW3211\tpemeriksaan akhir laporan\t报告最终检查\t质量\t质量\t\t\nW3222\tkondisi keselamatan\t安全状态\t安全\t安全\t\t\nW3233\tspesifikasi keselamatan\t安全规格\t安全\t安全\t\t\nW3244\tpemeliharaan helm keselamatan\t维护安全帽\t安全\t安全\t\t\nW3255\tbiaya helm keselamatan\t安全帽费用\t安全\t安全\t\t\nW3266\tpemasangan sabuk pengaman\t安装安全带\t安全\t安全\t\t\nW3277\tcatatan sabuk pengaman\t安全带记录\t安全\t安全\t\t\nW3288\tpemeriksaan rambu peringatan\t检查警示牌\t安全\t安全\t\t\nW3299\tdata rambu peringatan\t警示牌数据\t安全\t安全\t\t\nW3310\trambu peringatan sementara\t临时警示牌\t安全\t安全\t\t\nW3321\tukuran pagar pengaman\t防护栏尺寸\t安全\t安全\t\t\nW3332\trisiko pagar pengaman\t防护栏风险\t安全\t安全\t\t\nW3343\tlokasi kemajuan\t进度位置\t进度\t进度\t\t\nW3354\tpersiapan kemajuan\t进度准备\t进度\t进度\t\t\nW3365\tpekerjaan rencana\t计划作业\t进度\t进度\t\t\nW3376\tkualitas rencana\t计划质量\t进度\t进度\t\t\nW3387\tperbaikan masa pelaksanaan\t修复工期\t进度\t进度\t\t\nW3398\tjadwal masa pelaksanaan\t工期计划\t进度\t进度\t\t\nW3409\tpengukuran milestone\t测量里程碑\t进度\t进度\t\t\nW3420\thasil milestone\t里程碑结果\t进度\t进度\t\t\nW3431\tlaporan harian\t日报\t管理\t管理\t\t\nW3442\tgambar laporan harian\t日报图纸\t管理\t管理\t\t\nW3453\tlaporan harian utama\t主要日报\t管理\t管理\t\t\nW3464\tposisi rapat\t会议位置\t管理\t管理\t\t\nW3475\tpemeriksaan akhir rapat\t会议最终检查\t管理\t管理\t\t\nW3486\tkondisi catatan\t记录状态\t管理\t管理\t\t\nW3497\tspesifikasi catatan\t记录规格\t管理\t管理\t\t\nW3508\tpemeliharaan daftar pemeriksaan\t维护检查表\t管理\t管理\t\t\nW3519\tbiaya daftar pemeriksaan\t检查表费用\t管理\t管理\t\t\nW3530\tpemasangan tanda tangan\t安装签字\t管理\t管理\t\t\nW3541\tcatatan tanda tangan\t签字记录\t管理\t管理\t\t\nW3552\tpemeriksaan persetujuan\t检查审批\t管理\t管理\t\t\nW3563\tdata persetujuan\t审批数据\t管理\t管理\t\t\nW3574\tpersetujuan sementara\t临时审批\t管理\t管理\t\t\n
+id	indonesian	chinese	category	scene	example	example_chinese
+W0010	posisi pekerjaan konstruksi	施工位置	施工	施工		
+W0021	pemeriksaan akhir pekerjaan konstruksi	施工最终检查	施工	施工		
+W0032	kondisi proyek	项目状态	项目管理	项目管理		
+W0043	spesifikasi proyek	项目规格	项目管理	项目管理		
+W0054	pemeliharaan lapangan	维护现场	现场管理	现场管理		
+W0065	biaya lapangan	现场费用	现场管理	现场管理		
+W0076	pemasangan lokasi konstruksi	安装工地	现场管理	现场管理		
+W0087	catatan lokasi konstruksi	工地记录	现场管理	现场管理		
+W0098	pemeriksaan proyek teknik	检查工程	项目管理	项目管理		
+W0109	data proyek teknik	工程数据	项目管理	项目管理		
+W0120	proyek teknik sementara	临时工程	项目管理	项目管理		
+W0131	ukuran fondasi	基础尺寸	结构	结构		
+W0142	risiko fondasi	基础风险	结构	结构		
+W0153	lokasi tanah dasar	地基位置	土建	土建		
+W0164	persiapan tanah dasar	地基准备	土建	土建		
+W0175	pekerjaan pekerjaan tanah	土方作业	土建	土建		
+W0186	kualitas pekerjaan tanah	土方质量	土建	土建		
+W0197	perbaikan galian fondasi	修复基坑	土建	土建		
+W0208	jadwal galian fondasi	基坑计划	土建	土建		
+W0219	pengukuran lereng	测量边坡	土建	土建		
+W0230	hasil lereng	边坡结果	土建	土建		
+W0241	dinding penahan tanah	挡土墙	土建	土建		
+W0252	gambar dinding penahan tanah	挡土墙图纸	土建	土建		
+W0263	dinding penahan tanah utama	主要挡土墙	土建	土建		
+W0274	posisi pagar	围墙位置	土建	土建		
+W0285	pemeriksaan akhir pagar	围墙最终检查	土建	土建		
+W0296	kondisi saluran drainase	排水沟状态	水利	水利		
+W0307	spesifikasi saluran drainase	排水沟规格	水利	水利		
+W0318	pemeliharaan sumur pengumpul	维护集水井	水利	水利		
+W0329	biaya sumur pengumpul	集水井费用	水利	水利		
+W0340	pemasangan kolam sedimentasi	安装沉淀池	水利	水利		
+W0351	catatan kolam sedimentasi	沉淀池记录	水利	水利		
+W0362	pemeriksaan beton	检查混凝土	材料	材料		
+W0373	data beton	混凝土数据	材料	材料		
+W0384	beton sementara	临时混凝土	材料	材料		
+W0395	ukuran semen	水泥尺寸	材料	材料		
+W0406	risiko semen	水泥风险	材料	材料		
+W0417	lokasi pasir	砂位置	材料	材料		
+W0428	persiapan pasir	砂准备	材料	材料		
+W0439	pekerjaan batu pecah	碎石作业	材料	材料		
+W0450	kualitas batu pecah	碎石质量	材料	材料		
+W0461	perbaikan agregat	修复骨料	材料	材料		
+W0472	jadwal agregat	骨料计划	材料	材料		
+W0483	pengukuran tulangan	测量钢筋	钢筋	钢筋		
+W0494	hasil tulangan	钢筋结果	钢筋	钢筋		
+W0505	keranjang tulangan	钢筋笼	钢筋	钢筋		
+W0516	gambar keranjang tulangan	钢筋笼图纸	钢筋	钢筋		
+W0527	keranjang tulangan utama	主要钢筋笼	钢筋	钢筋		
+W0538	posisi sengkang	箍筋位置	钢筋	钢筋		
+W0549	pemeriksaan akhir sengkang	箍筋最终检查	钢筋	钢筋		
+W0560	kondisi tulangan pengikat	拉筋状态	钢筋	钢筋		
+W0571	spesifikasi tulangan pengikat	拉筋规格	钢筋	钢筋		
+W0582	pemeliharaan tulangan angkur	维护锚筋	钢筋	钢筋		
+W0593	biaya tulangan angkur	锚筋费用	钢筋	钢筋		
+W0604	pemasangan baja profil	安装型钢	钢结构	钢结构		
+W0615	catatan baja profil	型钢记录	钢结构	钢结构		
+W0626	pemeriksaan pelat baja	检查钢板	钢结构	钢结构		
+W0637	data pelat baja	钢板数据	钢结构	钢结构		
+W0648	pelat baja sementara	临时钢板	钢结构	钢结构		
+W0659	ukuran baut	螺栓尺寸	钢结构	钢结构		
+W0670	risiko baut	螺栓风险	钢结构	钢结构		
+W0681	lokasi jahitan las	焊缝位置	钢结构	钢结构		
+W0692	persiapan jahitan las	焊缝准备	钢结构	钢结构		
+W0703	pekerjaan pengelasan	焊接作业	钢结构	钢结构		
+W0714	kualitas pengelasan	焊接质量	钢结构	钢结构		
+W0725	perbaikan bekisting	修复模板	模板	模板		
+W0736	jadwal bekisting	模板计划	模板	模板		
+W0747	pengukuran bekisting kayu	测量木模板	模板	模板		
+W0758	hasil bekisting kayu	木模板结果	模板	模板		
+W0769	bekisting baja	钢模板	模板	模板		
+W0780	gambar bekisting baja	钢模板图纸	模板	模板		
+W0791	bekisting baja utama	主要钢模板	模板	模板		
+W0802	ukuran pemasangan bekisting	支模尺寸	模板	模板		
+W0813	risiko pemasangan bekisting	支模风险	模板	模板		
+W0824	lokasi pembongkaran bekisting	拆模位置	模板	模板		
+W0835	persiapan pembongkaran bekisting	拆模准备	模板	模板		
+W0846	pekerjaan perancah	脚手架作业	脚手架	脚手架		
+W0857	kualitas perancah	脚手架质量	脚手架	脚手架		
+W0868	perbaikan tiang vertikal	修复立杆	脚手架	脚手架		
+W0879	jadwal tiang vertikal	立杆计划	脚手架	脚手架		
+W0890	pengukuran batang horizontal	测量横杆	脚手架	脚手架		
+W0901	hasil batang horizontal	横杆结果	脚手架	脚手架		
+W0912	pengaku diagonal	剪刀撑	脚手架	脚手架		
+W0923	gambar pengaku diagonal	剪刀撑图纸	脚手架	脚手架		
+W0934	pengaku diagonal utama	主要剪刀撑	脚手架	脚手架		
+W0945	posisi papan perancah	脚手板位置	脚手架	脚手架		
+W0956	pemeriksaan akhir papan perancah	脚手板最终检查	脚手架	脚手架		
+W0967	kondisi pasangan dinding	砌体状态	砌筑	砌筑		
+W0978	spesifikasi pasangan dinding	砌体规格	砌筑	砌筑		
+W0989	pemeliharaan bata	维护砖	砌筑	砌筑		
+W1000	biaya bata	砖费用	砌筑	砌筑		
+W1011	pemasangan blok beton	安装砌块	砌筑	砌筑		
+W1022	catatan blok beton	砌块记录	砌筑	砌筑		
+W1033	pemeriksaan mortar	检查砂浆	砌筑	砌筑		
+W1044	data mortar	砂浆数据	砌筑	砌筑		
+W1055	mortar sementara	临时砂浆	砌筑	砌筑		
+W1066	ukuran plesteran	抹灰尺寸	装修	装修		
+W1077	risiko plesteran	抹灰风险	装修	装修		
+W1088	lokasi lantai	地面位置	装修	装修		
+W1099	persiapan lantai	地面准备	装修	装修		
+W1110	pekerjaan dinding	墙面作业	装修	装修		
+W1121	kualitas dinding	墙面质量	装修	装修		
+W1132	perbaikan plafon	修复天花板	装修	装修		
+W1143	jadwal plafon	天花板计划	装修	装修		
+W1154	pengukuran pintu dan jendela	测量门窗	装修	装修		
+W1165	hasil pintu dan jendela	门窗结果	装修	装修		
+W1176	lapisan kedap air	防水层	防水	防水		
+W1187	gambar lapisan kedap air	防水层图纸	防水	防水		
+W1198	lapisan kedap air utama	主要防水层	防水	防水		
+W1209	posisi pipa	管道位置	管道	管道		
+W1220	pemeriksaan akhir pipa	管道最终检查	管道	管道		
+W1231	kondisi pipa air bersih	给水管状态	管道	管道		
+W1242	spesifikasi pipa air bersih	给水管规格	管道	管道		
+W1253	pemeliharaan pipa drainase	维护排水管	管道	管道		
+W1264	biaya pipa drainase	排水管费用	管道	管道		
+W1275	pemasangan pipa bertekanan	安装压力管	管道	管道		
+W1286	catatan pipa bertekanan	压力管记录	管道	管道		
+W1297	pemeriksaan katup	检查阀门	管道	管道		
+W1308	data katup	阀门数据	管道	管道		
+W1319	katup sementara	临时阀门	管道	管道		
+W1330	ukuran flensa	法兰尺寸	管道	管道		
+W1341	risiko flensa	法兰风险	管道	管道		
+W1352	lokasi elbow	弯头位置	管道	管道		
+W1363	persiapan elbow	弯头准备	管道	管道		
+W1374	pekerjaan tee	三通作业	管道	管道		
+W1385	kualitas tee	三通质量	管道	管道		
+W1396	perbaikan sambungan	修复接头	管道	管道		
+W1407	jadwal sambungan	接头计划	管道	管道		
+W1418	pengukuran pompa air	测量水泵	水利	水利		
+W1429	hasil pompa air	水泵结果	水利	水利		
+W1440	tangki air	水箱	水利	水利		
+W1451	gambar tangki air	水箱图纸	水利	水利		
+W1462	tangki air utama	主要水箱	水利	水利		
+W1473	posisi sprinkler	喷头位置	灌溉	灌溉		
+W1484	pemeriksaan akhir sprinkler	喷头最终检查	灌溉	灌溉		
+W1495	kondisi pita irigasi tetes	滴灌带状态	灌溉	灌溉		
+W1506	spesifikasi pita irigasi tetes	滴灌带规格	灌溉	灌溉		
+W1517	pemeliharaan filter	维护过滤器	灌溉	灌溉		
+W1528	biaya filter	过滤器费用	灌溉	灌溉		
+W1539	pemasangan katup pengurang tekanan	安装减压阀	灌溉	灌溉		
+W1550	catatan katup pengurang tekanan	减压阀记录	灌溉	灌溉		
+W1561	pemeriksaan bak katup	检查阀井	水利	水利		
+W1572	data bak katup	阀井数据	水利	水利		
+W1583	bak katup sementara	临时阀井	水利	水利		
+W1594	ukuran bangunan pengambilan	取水口尺寸	水利	水利		
+W1605	risiko bangunan pengambilan	取水口风险	水利	水利		
+W1616	lokasi bak penampung air	蓄水池位置	水利	水利		
+W1627	persiapan bak penampung air	蓄水池准备	水利	水利		
+W1638	pekerjaan saluran	渠道作业	水利	水利		
+W1649	kualitas saluran	渠道质量	水利	水利		
+W1660	perbaikan pintu air	修复闸门	水利	水利		
+W1671	jadwal pintu air	闸门计划	水利	水利		
+W1682	pengukuran jalan	测量道路	道路	道路		
+W1693	hasil jalan	道路结果	道路	道路		
+W1704	badan jalan	路基	道路	道路		
+W1715	gambar badan jalan	路基图纸	道路	道路		
+W1726	badan jalan utama	主要路基	道路	道路		
+W1737	posisi permukaan jalan	路面位置	道路	道路		
+W1748	pemeriksaan akhir permukaan jalan	路面最终检查	道路	道路		
+W1759	kondisi aspal	沥青状态	道路	道路		
+W1770	spesifikasi aspal	沥青规格	道路	道路		
+W1781	pemeliharaan trotoar	维护人行道	道路	道路		
+W1792	biaya trotoar	人行道费用	道路	道路		
+W1803	pemasangan kanstin	安装路缘石	道路	道路		
+W1814	catatan kanstin	路缘石记录	道路	道路		
+W1825	pemeriksaan jembatan	检查桥梁	桥梁	桥梁		
+W1836	data jembatan	桥梁数据	桥梁	桥梁		
+W1847	jembatan sementara	临时桥梁	桥梁	桥梁		
+W1858	ukuran abutmen	桥台尺寸	桥梁	桥梁		
+W1869	risiko abutmen	桥台风险	桥梁	桥梁		
+W1880	lokasi pilar jembatan	桥墩位置	桥梁	桥梁		
+W1891	persiapan pilar jembatan	桥墩准备	桥梁	桥梁		
+W1902	pekerjaan balok dan pelat	梁板作业	桥梁	桥梁		
+W1913	kualitas balok dan pelat	梁板质量	桥梁	桥梁		
+W1924	perbaikan peralatan	修复设备	机械	机械		
+W1935	jadwal peralatan	设备计划	机械	机械		
+W1946	pengukuran mesin	测量机械	机械	机械		
+W1957	hasil mesin	机械结果	机械	机械		
+W1968	ekskavator	挖掘机	机械	机械		
+W1979	gambar ekskavator	挖掘机图纸	机械	机械		
+W1990	ekskavator utama	主要挖掘机	机械	机械		
+W2001	posisi loader	装载机位置	机械	机械		
+W2012	pemeriksaan akhir loader	装载机最终检查	机械	机械		
+W2023	kondisi mesin pemadat	压路机状态	机械	机械		
+W2034	spesifikasi mesin pemadat	压路机规格	机械	机械		
+W2045	pemeliharaan crane	维护吊车	机械	机械		
+W2056	biaya crane	吊车费用	机械	机械		
+W2067	pemasangan mixer	安装搅拌机	机械	机械		
+W2078	catatan mixer	搅拌机记录	机械	机械		
+W2089	pemeriksaan generator	检查发电机	机电	机电		
+W2100	data generator	发电机数据	机电	机电		
+W2111	generator sementara	临时发电机	机电	机电		
+W2122	ukuran kompresor udara	空压机尺寸	机械	机械		
+W2133	risiko kompresor udara	空压机风险	机械	机械		
+W2144	lokasi mesin las	焊机位置	机电	机电		
+W2155	persiapan mesin las	焊机准备	机电	机电		
+W2166	pekerjaan kabel	电缆作业	电气	电气		
+W2177	kualitas kabel	电缆质量	电气	电气		
+W2188	perbaikan kabel listrik	修复电线	电气	电气		
+W2199	jadwal kabel listrik	电线计划	电气	电气		
+W2210	pengukuran panel distribusi	测量配电箱	电气	电气		
+W2221	hasil panel distribusi	配电箱结果	电气	电气		
+W2232	pemutus sirkuit	断路器	电气	电气		
+W2243	gambar pemutus sirkuit	断路器图纸	电气	电气		
+W2254	pemutus sirkuit utama	主要断路器	电气	电气		
+W2265	posisi pembumian	接地位置	电气	电气		
+W2276	pemeriksaan akhir pembumian	接地最终检查	电气	电气		
+W2287	kondisi pencahayaan	照明状态	电气	电气		
+W2298	spesifikasi pencahayaan	照明规格	电气	电气		
+W2309	pemeliharaan stop kontak	维护插座	电气	电气		
+W2320	biaya stop kontak	插座费用	电气	电气		
+W2331	pemasangan sakelar	安装开关	电气	电气		
+W2342	catatan sakelar	开关记录	电气	电气		
+W2353	pemeriksaan panel kontrol	检查控制柜	电气	电气		
+W2364	data panel kontrol	控制柜数据	电气	电气		
+W2375	panel kontrol sementara	临时控制柜	电气	电气		
+W2386	ukuran motor listrik	电机尺寸	机电	机电		
+W2397	risiko motor listrik	电机风险	机电	机电		
+W2408	lokasi pengukuran	测量位置	测量	测量		
+W2419	persiapan pengukuran	测量准备	测量	测量		
+W2430	pekerjaan total station	全站仪作业	测量	测量		
+W2441	kualitas total station	全站仪质量	测量	测量		
+W2452	perbaikan alat ukur nivo	修复水准仪	测量	测量		
+W2463	jadwal alat ukur nivo	水准仪计划	测量	测量		
+W2474	pengukuran prisma	测量棱镜	测量	测量		
+W2485	hasil prisma	棱镜结果	测量	测量		
+W2496	rambu ukur	测杆	测量	测量		
+W2507	gambar rambu ukur	测杆图纸	测量	测量		
+W2518	rambu ukur utama	主要测杆	测量	测量		
+W2529	posisi meteran	卷尺位置	测量	测量		
+W2540	pemeriksaan akhir meteran	卷尺最终检查	测量	测量		
+W2551	kondisi koordinat	坐标状态	测量	测量		
+W2562	spesifikasi koordinat	坐标规格	测量	测量		
+W2573	pemeliharaan elevasi	维护高程	测量	测量		
+W2584	biaya elevasi	高程费用	测量	测量		
+W2595	pemasangan titik referensi	安装基准点	测量	测量		
+W2606	catatan titik referensi	基准点记录	测量	测量		
+W2617	pemeriksaan titik kontrol	检查控制点	测量	测量		
+W2628	data titik kontrol	控制点数据	测量	测量		
+W2639	titik kontrol sementara	临时控制点	测量	测量		
+W2650	ukuran pematokan	放样尺寸	测量	测量		
+W2661	risiko pematokan	放样风险	测量	测量		
+W2672	lokasi penampang	断面位置	测量	测量		
+W2683	persiapan penampang	断面准备	测量	测量		
+W2694	pekerjaan azimut	方位角作业	测量	测量		
+W2705	kualitas azimut	方位角质量	测量	测量		
+W2716	perbaikan jarak	修复距离	测量	测量		
+W2727	jadwal jarak	距离计划	测量	测量		
+W2738	pengukuran sudut	测量角度	测量	测量		
+W2749	hasil sudut	角度结果	测量	测量		
+W2760	gambar kerja	图纸	技术	技术		
+W2771	gambar gambar kerja	图纸图纸	技术	技术		
+W2782	gambar kerja utama	主要图纸	技术	技术		
+W2793	posisi gambar konstruksi	施工图位置	技术	技术		
+W2804	pemeriksaan akhir gambar konstruksi	施工图最终检查	技术	技术		
+W2815	kondisi gambar detail	详图状态	技术	技术		
+W2826	spesifikasi gambar detail	详图规格	技术	技术		
+W2837	pekerjaan gambar penampang	剖面图作业	技术	技术		
+W2848	kualitas gambar penampang	剖面图质量	技术	技术		
+W2859	perbaikan gambar denah	修复平面图	技术	技术		
+W2870	jadwal gambar denah	平面图计划	技术	技术		
+W2881	pengukuran detail titik	测量节点	技术	技术		
+W2892	hasil detail titik	节点结果	技术	技术		
+W2903	ukuran	尺寸	技术	技术		
+W2914	gambar ukuran	尺寸图纸	技术	技术		
+W2925	ukuran utama	主要尺寸	技术	技术		
+W2936	posisi simbol	符号位置	技术	技术		
+W2947	pemeriksaan akhir simbol	符号最终检查	技术	技术		
+W2958	kondisi revisi	版本状态	技术	技术		
+W2969	spesifikasi revisi	版本规格	技术	技术		
+W2980	pemeliharaan material	维护材料	材料	材料		
+W2991	biaya material	材料费用	材料	材料		
+W3002	pemasangan batch	安装批次	材料管理	材料管理		
+W3013	catatan batch	批次记录	材料管理	材料管理		
+W3024	pemeriksaan sampel	检查样品	质量	质量		
+W3035	data sampel	样品数据	质量	质量		
+W3046	sampel sementara	临时样品	质量	质量		
+W3057	ukuran spesifikasi	规格尺寸	质量	质量		
+W3068	risiko spesifikasi	规格风险	质量	质量		
+W3079	lokasi jumlah	数量位置	材料管理	材料管理		
+W3090	persiapan jumlah	数量准备	材料管理	材料管理		
+W3101	pekerjaan kualitas	质量作业	质量	质量		
+W3112	kualitas kualitas	质量质量	质量	质量		
+W3123	perbaikan pemeriksaan	修复检验	质量	质量		
+W3134	jadwal pemeriksaan	检验计划	质量	质量		
+W3145	pengukuran pengujian	测量试验	质量	质量		
+W3156	hasil pengujian	试验结果	质量	质量		
+W3167	pengambilan sampel	取样	质量	质量		
+W3178	gambar pengambilan sampel	取样图纸	质量	质量		
+W3189	pengambilan sampel utama	主要取样	质量	质量		
+W3200	posisi laporan	报告位置	质量	质量		
+W3211	pemeriksaan akhir laporan	报告最终检查	质量	质量		
+W3222	kondisi keselamatan	安全状态	安全	安全		
+W3233	spesifikasi keselamatan	安全规格	安全	安全		
+W3244	pemeliharaan helm keselamatan	维护安全帽	安全	安全		
+W3255	biaya helm keselamatan	安全帽费用	安全	安全		
+W3266	pemasangan sabuk pengaman	安装安全带	安全	安全		
+W3277	catatan sabuk pengaman	安全带记录	安全	安全		
+W3288	pemeriksaan rambu peringatan	检查警示牌	安全	安全		
+W3299	data rambu peringatan	警示牌数据	安全	安全		
+W3310	rambu peringatan sementara	临时警示牌	安全	安全		
+W3321	ukuran pagar pengaman	防护栏尺寸	安全	安全		
+W3332	risiko pagar pengaman	防护栏风险	安全	安全		
+W3343	lokasi kemajuan	进度位置	进度	进度		
+W3354	persiapan kemajuan	进度准备	进度	进度		
+W3365	pekerjaan rencana	计划作业	进度	进度		
+W3376	kualitas rencana	计划质量	进度	进度		
+W3387	perbaikan masa pelaksanaan	修复工期	进度	进度		
+W3398	jadwal masa pelaksanaan	工期计划	进度	进度		
+W3409	pengukuran milestone	测量里程碑	进度	进度		
+W3420	hasil milestone	里程碑结果	进度	进度		
+W3431	laporan harian	日报	管理	管理		
+W3442	gambar laporan harian	日报图纸	管理	管理		
+W3453	laporan harian utama	主要日报	管理	管理		
+W3464	posisi rapat	会议位置	管理	管理		
+W3475	pemeriksaan akhir rapat	会议最终检查	管理	管理		
+W3486	kondisi catatan	记录状态	管理	管理		
+W3497	spesifikasi catatan	记录规格	管理	管理		
+W3508	pemeliharaan daftar pemeriksaan	维护检查表	管理	管理		
+W3519	biaya daftar pemeriksaan	检查表费用	管理	管理		
+W3530	pemasangan tanda tangan	安装签字	管理	管理		
+W3541	catatan tanda tangan	签字记录	管理	管理		
+W3552	pemeriksaan persetujuan	检查审批	管理	管理		
+W3563	data persetujuan	审批数据	管理	管理		
+W3574	persetujuan sementara	临时审批	管理	管理		
