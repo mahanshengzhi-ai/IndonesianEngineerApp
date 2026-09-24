@@ -25,7 +25,7 @@ import shutil
 import subprocess
 import tempfile
 import time
-from concurrent.futures import ThreadPoolExecutor, as_completed
+import zipfile
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -42,6 +42,7 @@ USER_AGENT = "IndonesianEngineerApp/0.7 audio-builder"
 PAUSE_MS = 120
 TARGET_LINES = 3000
 MAX_LINES = 3000
+DATASET_URL = "https://lingualibre.org/datasets/Q305-ind-Indonesian.zip"
 
 
 def request_json(params: dict[str, Any], retries: int = 8) -> dict[str, Any]:
@@ -293,51 +294,60 @@ def normalize_wav_bytes(raw: bytes) -> tuple[bytes, int]:
     return frames, duration_ms
 
 
+def download_dataset_zip(cache_root: Path) -> Path:
+    destination = cache_root / "Q305-ind-Indonesian.zip"
+    if destination.exists() and destination.stat().st_size > 1_000_000:
+        return destination
+    print("Downloading Lingua Libre Indonesian dataset:", DATASET_URL)
+    download_file(DATASET_URL, destination)
+    return destination
+
+
+def duration_ms_from_wav(path: Path) -> int:
+    with wave.open(str(path), "rb") as wav:
+        frames = wav.getnframes()
+        rate = wav.getframerate()
+        return max(1, round(frames * 1000 / rate))
+
+
 def make_concat_audio(
     selected: list[dict[str, Any]],
     temp_root: Path,
     output_path: Path,
+    dataset_zip: zipfile.ZipFile,
 ) -> list[dict[str, Any]]:
-    pause_frames = b"\x00\x00" * round(24000 * PAUSE_MS / 1000)
-    jobs = list(enumerate(selected, start=1))
-    prepared: dict[int, tuple[dict[str, Any], bytes, int]] = {}
+    audio_dir = temp_root / "clips"
+    audio_dir.mkdir(parents=True, exist_ok=True)
+    silence_path = temp_root / "silence.wav"
 
-    def prepare(
-        number: int,
-        item: dict[str, Any],
-    ) -> tuple[int, dict[str, Any], bytes, int]:
-        raw_path = temp_root / (
-            hashlib.sha1(item["title"].encode("utf-8")).hexdigest() + ".wav"
-        )
-        download_file(item["url"], raw_path)
-        frames, duration_ms = normalize_wav_bytes(raw_path.read_bytes())
-        return number, item, frames, duration_ms
+    with wave.open(str(silence_path), "wb") as silence:
+        silence.setnchannels(1)
+        silence.setsampwidth(2)
+        silence.setframerate(48000)
+        silence.writeframes(b"\x00\x00" * round(48000 * PAUSE_MS / 1000))
 
-    with ThreadPoolExecutor(max_workers=min(8, max(2, len(jobs)))) as executor:
-        futures = [
-            executor.submit(prepare, number, item)
-            for number, item in jobs
-        ]
-        completed = 0
-        for future in as_completed(futures):
-            number, item, frames, duration_ms = future.result()
-            prepared[number] = (item, frames, duration_ms)
-            completed += 1
-            if completed % 250 == 0 or completed == len(jobs):
-                print(f"Prepared audio {completed}/{len(jobs)}")
+    zip_members = {}
+    for member in dataset_zip.namelist():
+        if member.lower().endswith(".wav"):
+            zip_members[Path(member).name] = member
 
-    combined_path = temp_root / "combined.wav"
-    rows: list[dict[str, Any]] = []
+    concat_file = temp_root / "concat.txt"
+    rows = []
     running_ms = 0
+    extracted = 0
 
-    with wave.open(str(combined_path), "wb") as combined:
-        combined.setnchannels(1)
-        combined.setsampwidth(2)
-        combined.setframerate(24000)
+    with concat_file.open("w", encoding="utf-8") as playlist:
+        for number, item in enumerate(selected, start=1):
+            clip_path = audio_dir / (f"{number:04d}.wav")
+            member_name = zip_members.get(item["title"])
 
-        for number in range(1, len(jobs) + 1):
-            item, frames, duration_ms = prepared[number]
-            combined.writeframes(frames)
+            if member_name:
+                with dataset_zip.open(member_name, "r") as source, clip_path.open("wb") as target:
+                    shutil.copyfileobj(source, target)
+            else:
+                download_file(item["url"], clip_path)
+
+            duration_ms = duration_ms_from_wav(clip_path)
             rows.append({
                 "sha256": sha256(item["target_text"]),
                 "start_ms": running_ms,
@@ -347,21 +357,31 @@ def make_concat_audio(
                 "source_url": item["source_url"],
                 "license": "CC0-1.0",
             })
+
+            escaped = str(clip_path).replace("'", "'\\''")
+            playlist.write("file '" + escaped + "'\n")
             running_ms += duration_ms
-            if number != len(jobs):
-                combined.writeframes(pause_frames)
+
+            if number != len(selected):
+                playlist.write("file '" + str(silence_path).replace("'", "'\\''") + "'\n")
                 running_ms += PAUSE_MS
+
+            extracted += 1
+            if extracted % 500 == 0 or extracted == len(selected):
+                print(f"Prepared audio {extracted}/{len(selected)}")
 
     output_path.parent.mkdir(parents=True, exist_ok=True)
     run([
         "ffmpeg", "-y", "-loglevel", "error",
-        "-i", str(combined_path),
+        "-f", "concat", "-safe", "0",
+        "-i", str(concat_file),
         "-c:a", "aac",
         "-b:a", "48k",
         "-movflags", "+faststart",
         str(output_path),
     ])
     return rows
+
 
 def main() -> int:
     parser = argparse.ArgumentParser()
@@ -465,12 +485,15 @@ def main() -> int:
     audio_path = assets / "tts_audio.m4a"
     index_path = assets / "tts_index.tsv"
 
-    with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
-        rows = make_concat_audio(
-            selected,
-            Path(temp_dir),
-            audio_path,
-        )
+    dataset_zip_path = download_dataset_zip(cache_root)
+    with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
+        with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
+            rows = make_concat_audio(
+                selected,
+                Path(temp_dir),
+                audio_path,
+                dataset_zip,
+            )
 
     write_index(index_path, rows)
 
