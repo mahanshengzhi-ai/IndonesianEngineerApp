@@ -38,7 +38,7 @@ def collect_audio_texts(words, sentences, scenes, letters):
 
 def count_cjk_in_vocabulary(rows):
     import re
-    pattern = re.compile(r"[\\u3400-\\u4dbf\\u4e00-\\u9fff]")
+    pattern = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
     return sum(1 for row in rows if pattern.search(row.get("indonesian", "")))
 
 def scan_forbidden():
