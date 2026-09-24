@@ -11,6 +11,7 @@ object StudyPage {
         context: Context,
         repository: LearningRepository,
         onPlay: (String) -> Unit,
+        hasAudio: (String) -> Boolean,
         onMarkLearned: (String) -> Unit
     ): LinearLayout {
         val root = Ui.page(context)
@@ -42,10 +43,15 @@ object StudyPage {
                 setPadding(0, Ui.dp(context, 7), 0, 0)
             })
             word.addView(Ui.body(context, first.chinese).apply { setPadding(0, Ui.dp(context, 4), 0, 0) })
-            word.addView(Ui.button(context, if (first.indonesian.isNotBlank()) "听一下" else "暂无内置语音") {
-                onPlay(first.indonesian)
-                onMarkLearned(first.id)
-            }).apply { setPadding(0, Ui.dp(context, 12), 0, 0) })
+            val available = hasAudio(first.indonesian)
+            val audioButton = Ui.button(context, if (available) "听一下" else "暂无内置语音") {
+                if (available) {
+                    onPlay(first.indonesian)
+                    onMarkLearned(first.id)
+                }
+            }
+            audioButton.isEnabled = available
+            word.addView(audioButton.apply { setPadding(0, Ui.dp(context, 12), 0, 0) })
             root.addView(Ui.card(context, word))
         }
         return root
