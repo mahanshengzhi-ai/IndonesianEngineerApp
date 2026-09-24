@@ -6,6 +6,8 @@ import hashlib
 import re
 import subprocess
 import tempfile
+import os
+import shutil
 import unicodedata
 from pathlib import Path
 from urllib.parse import unquote
@@ -119,12 +121,21 @@ def metadata_for_titles(session: requests.Session, titles: list[str]) -> dict[st
     return result
 
 def download_file(session: requests.Session, url: str, out: Path) -> None:
+    cache_dir = Path(os.environ.get("AUDIO_CACHE_DIR", ""))
+    if str(cache_dir):
+        cache_dir.mkdir(parents=True, exist_ok=True)
+        cache_file = cache_dir / (hashlib.sha256(url.encode("utf-8")).hexdigest() + ".wav")
+        if cache_file.exists():
+            shutil.copy2(cache_file, out)
+            return
     with session.get(url, timeout=120, stream=True) as response:
         response.raise_for_status()
         with out.open("wb") as f:
             for chunk in response.iter_content(1024 * 256):
                 if chunk:
                     f.write(chunk)
+    if str(cache_dir):
+        shutil.copy2(out, cache_file)
 
 def duration_ms(path: Path) -> int:
     result = subprocess.run(
