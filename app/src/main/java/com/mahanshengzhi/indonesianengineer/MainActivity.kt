@@ -165,12 +165,13 @@ class MainActivity : AppCompatActivity() {
                             this,
                             repository,
                             audioPlayer::hasAudio,
-                            ::playAudio
-                        ) {
-                            progress.markLearned(it)
-                            progress.markDailyWord()
-                        },
-                        isLearned = progress::isLearned
+                            ::playAudio,
+                            onLearned = {
+                                progress.markLearned(it)
+                                progress.markDailyWord()
+                            },
+                            isLearned = progress::isLearned
+                        )
                     )
                 },
                 onOpenSentences = {
