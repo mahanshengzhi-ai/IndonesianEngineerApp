@@ -131,7 +131,7 @@ class QuizPage(
         content.addView(UiKit.body(activity, question.prompt, 19f))
         UiKit.addGap(content, activity, 8)
 
-        if (question.audioText != null) {
+        if (question.audioText != null && activity.hasAudio(question.audioText)) {
             val audio = UiKit.secondaryButton(activity, "先听一句")
             audio.setOnClickListener { activity.playAudio(question.audioText) }
             content.addView(audio)
