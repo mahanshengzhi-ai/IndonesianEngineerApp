@@ -21,6 +21,7 @@ import com.mahanshengzhi.indonesianengineer.audio.AudioPlayer
 import com.mahanshengzhi.indonesianengineer.data.LearningRepository
 import com.mahanshengzhi.indonesianengineer.data.ProgressStore
 import com.mahanshengzhi.indonesianengineer.translation.TranslationEngine
+import com.mahanshengzhi.indonesianengineer.ui.FlashcardPage
 import com.mahanshengzhi.indonesianengineer.ui.HomePage
 import com.mahanshengzhi.indonesianengineer.ui.PracticePage
 import com.mahanshengzhi.indonesianengineer.ui.PronunciationPage
@@ -213,6 +214,19 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_practice -> PracticePage.build(
                 this,
                 progress,
+                onStartFlashcards = {
+                    showSubPage(
+                        FlashcardPage.build(
+                            this,
+                            repository,
+                            progress,
+                            audioPlayer::hasAudio,
+                            ::playAudio
+                        ) {
+                            bottomNavigation.selectedItemId = R.id.nav_practice
+                        }
+                    )
+                },
                 onStartQuiz = {
                     showSubPage(
                         QuizPage.build(this, repository, progress) {
