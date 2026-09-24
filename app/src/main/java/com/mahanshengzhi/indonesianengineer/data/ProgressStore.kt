@@ -14,24 +14,30 @@ class ProgressStore(context: Context) {
     fun markLearned(id: String) {
         if (isLearned(id)) return
         prefs.edit()
-            .putBoolean("learned_\$id", true)
+            .putBoolean("learned_" + id, true)
             .putInt("learned_total", learnedTotal() + 1)
             .apply()
     }
 
-    fun isLearned(id: String): Boolean = prefs.getBoolean("learned_\$id", false)
+    fun isLearned(id: String): Boolean = prefs.getBoolean("learned_" + id, false)
     fun learnedTotal(): Int = prefs.getInt("learned_total", 0)
 
-    fun markDailyWord() = increment("daily_words_\${today()}")
-    fun dailyWords(): Int = prefs.getInt("daily_words_\${today()}", 0)
+    fun markDailyWord() = increment("daily_words_" + today())
+    fun dailyWords(): Int = prefs.getInt("daily_words_" + today(), 0)
 
-    fun incrementAudio() = increment("daily_audio_\${today()}")
-    fun incrementQuiz() = increment("daily_quiz_\${today()}")
-    fun incrementTranslation() = increment("daily_translate_\${today()}")
+    fun markDailySentence() = increment("daily_sentences_" + today())
+    fun dailySentences(): Int = prefs.getInt("daily_sentences_" + today(), 0)
 
-    fun dailyAudio(): Int = prefs.getInt("daily_audio_\${today()}", 0)
-    fun dailyQuiz(): Int = prefs.getInt("daily_quiz_\${today()}", 0)
-    fun dailyTranslation(): Int = prefs.getInt("daily_translate_\${today()}", 0)
+    fun markDailyScene() = increment("daily_scene_" + today())
+    fun dailyScene(): Int = prefs.getInt("daily_scene_" + today(), 0)
+
+    fun incrementAudio() = increment("daily_audio_" + today())
+    fun incrementQuiz() = increment("daily_quiz_" + today())
+    fun incrementTranslation() = increment("daily_translate_" + today())
+
+    fun dailyAudio(): Int = prefs.getInt("daily_audio_" + today(), 0)
+    fun dailyQuiz(): Int = prefs.getInt("daily_quiz_" + today(), 0)
+    fun dailyTranslation(): Int = prefs.getInt("daily_translate_" + today(), 0)
 
     fun updateBestQuiz(score: Int) {
         if (score > bestQuiz()) {
@@ -41,23 +47,23 @@ class ProgressStore(context: Context) {
 
     fun bestQuiz(): Int = prefs.getInt("quiz_best", 0)
 
-    fun isFavorite(id: String): Boolean = prefs.getBoolean("favorite_\$id", false)
+    fun isFavorite(id: String): Boolean = prefs.getBoolean("favorite_" + id, false)
 
     fun setFavorite(id: String, favorite: Boolean) {
-        prefs.edit().putBoolean("favorite_\$id", favorite).apply()
+        prefs.edit().putBoolean("favorite_" + id, favorite).apply()
     }
 
     fun checkIn() {
         val todayKey = today()
         val editor = prefs.edit()
-        if (!prefs.getBoolean("checkin_\$todayKey", false)) {
+        if (!prefs.getBoolean("checkin_" + todayKey, false)) {
             val previous = previousDate()
-            val streak = if (prefs.getBoolean("checkin_\$previous", false)) {
+            val streak = if (prefs.getBoolean("checkin_" + previous, false)) {
                 prefs.getInt("streak", 0) + 1
             } else {
                 1
             }
-            editor.putBoolean("checkin_\$todayKey", true)
+            editor.putBoolean("checkin_" + todayKey, true)
                 .putString("last_checkin", todayKey)
                 .putInt("streak", streak)
                 .putInt("checkins", prefs.getInt("checkins", 0) + 1)

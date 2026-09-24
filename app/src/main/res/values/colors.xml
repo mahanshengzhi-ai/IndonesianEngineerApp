@@ -8,4 +8,7 @@
     <color name="page_background">#F6F4EF</color>
     <color name="text_primary">#24312E</color>
     <color name="text_secondary">#6B7772</color>
+    <color name="card_stroke">#E3DED4</color>
+    <color name="card_green">#E8F3EC</color>
+    <color name="card_blue">#EAF0F7</color>
 </resources>

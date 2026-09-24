@@ -9,8 +9,15 @@ import com.google.mlkit.nl.translate.TranslatorOptions
 class TranslationEngine {
     private var translator: Translator? = null
 
-    fun prepareChineseToIndonesian() = prepare(TranslateLanguage.CHINESE, TranslateLanguage.INDONESIAN)
-    fun prepareIndonesianToChinese() = prepare(TranslateLanguage.INDONESIAN, TranslateLanguage.CHINESE)
+    fun prepareChineseToIndonesian() = prepare(
+        TranslateLanguage.CHINESE,
+        TranslateLanguage.INDONESIAN
+    )
+
+    fun prepareIndonesianToChinese() = prepare(
+        TranslateLanguage.INDONESIAN,
+        TranslateLanguage.CHINESE
+    )
 
     private fun prepare(source: String, target: String) {
         translator?.close()
@@ -25,14 +32,20 @@ class TranslationEngine {
     fun download(onReady: () -> Unit, onError: (Exception) -> Unit) {
         val current = translator ?: return
         current.downloadModelIfNeeded(
-            DownloadConditions.Builder().requireWifi().build()
+            DownloadConditions.Builder().build()
         ).addOnSuccessListener { onReady() }
-         .addOnFailureListener { onError(it) }
+            .addOnFailureListener { onError(it) }
     }
 
-    fun translate(text: String, onSuccess: (String) -> Unit, onError: (Exception) -> Unit) {
+    fun translate(
+        text: String,
+        onSuccess: (String) -> Unit,
+        onError: (Exception) -> Unit
+    ) {
         val current = translator ?: return
-        current.translate(text).addOnSuccessListener(onSuccess).addOnFailureListener(onError)
+        current.translate(text)
+            .addOnSuccessListener(onSuccess)
+            .addOnFailureListener(onError)
     }
 
     fun close() {
