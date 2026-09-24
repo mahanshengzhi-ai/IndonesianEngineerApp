@@ -322,4 +322,30 @@ W3520	kualitas daftar pemeriksaan	检查表质量	管理	管理
 W3531	perbaikan tanda tangan	修复签字	管理	管理		
 W3542	jadwal tanda tangan	签字计划	管理	管理		
 W3553	pengukuran persetujuan	测量审批	管理	管理		
-W3564	hasil persetujuan	审批结果	管理	管理		
+W3564	hasil persetujuan	审批结果	管理	管理
+W3575	alat ukur	测量仪器	测量	测量放样	Pastikan alat ukur sudah dikalibrasi.	确认测量仪器已经校准。
+W3586	total station	全站仪	测量	测量放样	Gunakan total station untuk mengambil koordinat titik.	用全站仪测量点的坐标。
+W3597	patok ukur	测量桩	测量	测量放样	Pasang patok ukur sesuai titik rencana.	按照设计点位设置测量桩。
+W3608	garis elevasi	高程线	测量	测量放样	Tandai garis elevasi pada dinding.	在墙上标出高程线。
+W3619	titik kontrol	控制点	测量	测量放样	Jangan pindahkan titik kontrol proyek.	不要移动项目控制点。
+W3630	koordinat titik	点坐标	测量	测量放样	Catat koordinat titik ini di buku ukur.	把这个点的坐标记录在测量记录本里。
+W3641	beda tinggi	高差	测量	测量放样	Hitung beda tinggi antara dua titik.	计算两个点之间的高差。
+W3652	jarak horizontal	水平距离	测量	测量放样	Ukur jarak horizontal dari titik A ke B.	测量 A 点到 B 点的水平距离。
+W3663	sudut horizontal	水平角	测量	测量放样	Baca sudut horizontal dengan teliti.	仔细读取水平角。
+W3674	sudut vertikal	竖直角	测量	测量放样	Periksa sudut vertikal sebelum mencatat.	记录前检查竖直角。
+W3685	waterpass	水准仪	测量	测量放样	Gunakan waterpass untuk mengecek ketinggian.	用水准仪检查高程。
+W3696	statif alat ukur	测量仪器三脚架	测量	测量放样	Pasang statif alat ukur di tanah yang stabil.	把测量仪器三脚架架设在稳定地面上。
+W3707	rambu ukur	水准尺	测量	测量放样	Pegang rambu ukur tetap tegak.	保持水准尺竖直。
+W3718	prisma reflektor	反射棱镜	测量	测量放样	Pasang prisma reflektor pada titik yang benar.	把反射棱镜安装在正确点位。
+W3729	titik referensi	参考点	测量	测量放样	Gunakan titik referensi yang sudah disetujui.	使用已经批准的参考点。
+W3740	as bangunan	建筑轴线	施工	图纸确认	Pastikan as bangunan sesuai gambar kerja.	确认建筑轴线与施工图一致。
+W3751	garis sumbu	中心线	施工	图纸确认	Tarik garis sumbu sebelum memasang kolom.	安装柱子前先弹中心线。
+W3762	bekisting	模板	施工	混凝土浇筑	Periksa bekisting sebelum pengecoran.	浇筑混凝土前检查模板。
+W3773	tulangan utama	主筋	钢筋	材料到场	Pastikan tulangan utama sesuai diameter dalam gambar.	确认主筋直径符合图纸。
+W3784	sengkang	箍筋	钢筋	材料到场	Jarak sengkang harus sesuai gambar kerja.	箍筋间距必须符合施工图。
+W3795	selimut beton	混凝土保护层	混凝土	混凝土浇筑	Jaga ketebalan selimut beton tetap sesuai spesifikasi.	保持混凝土保护层厚度符合规范。
+W3806	slump beton	混凝土坍落度	混凝土	混凝土浇筑	Periksa slump beton sebelum pengecoran.	浇筑前检查混凝土坍落度。
+W3817	vibrator beton	混凝土振捣器	混凝土	混凝土浇筑	Gunakan vibrator beton untuk memadatkan beton.	用混凝土振捣器使混凝土密实。
+W3828	perawatan beton	混凝土养护	混凝土	混凝土浇筑	Perawatan beton harus dilakukan setelah pengecoran.	浇筑后必须进行混凝土养护。
+W3839	mutu beton	混凝土强度等级	混凝土	混凝土浇筑	Mutu beton harus sesuai spesifikasi proyek.	混凝土强度等级必须符合项目要求。
+W3850	uji kuat tekan	抗压强度试验	质量	质量检查	Lakukan uji kuat tekan sesuai jadwal.	按照计划进行抗压强度试验。
