@@ -12,7 +12,7 @@ class AudioPlayer(context: Context) {
     private val appContext = context.applicationContext
     private var player: ExoPlayer? = null
     private val index = AudioIndex(appContext)
-    private var requestedSpeed = 1.0f
+    private var requestedSpeed = 0.88f
 
     fun hasAudio(text: String): Boolean = index.find(text) != null
 
