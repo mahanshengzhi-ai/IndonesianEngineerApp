@@ -94,6 +94,15 @@ def main() -> None:
         if not row["indonesian"].strip() or not row["chinese"].strip()
     ]
 
+
+    def grouped(values):
+        groups = {}
+        for index, value in enumerate(values):
+            groups.setdefault(value, []).append(rows[index]["id"])
+        return {k: v for k, v in groups.items() if len(v) > 1}
+
+    duplicate_ind_groups = grouped(ind)
+    duplicate_zh_groups = grouped(zh)
     print(f"VOCABULARY_COUNT = {len(rows)}")
     print(f"UNIQUE_CHINESE_MEANINGS = {len(set(zh))}")
     print(f"DUPLICATE_IDS = {duplicate_ids}")
@@ -107,6 +116,19 @@ def main() -> None:
     print(f"OLD_WATERPASS_TERM = {len(old_waterpass)}")
     print(f"MISSING_REQUIRED_FIELDS = {len(missing_required)}")
     print(f"EMPTY_LEARNING_FIELDS = {len(suspicious_empty)}")
+    if duplicate_ind_groups:
+        print("DUPLICATE_INDONESIAN_DETAILS =")
+        for key, ids in list(duplicate_ind_groups.items())[:20]:
+            print(f"  {key} -> {ids}")
+    if duplicate_zh_groups:
+        print("DUPLICATE_CHINESE_DETAILS =")
+        for key, ids in list(duplicate_zh_groups.items())[:20]:
+            print(f"  {key} -> {ids}")
+    if bad_templates:
+        print("BAD_TEMPLATE_DETAILS =")
+        for row in rows:
+            if row["id"] in set(bad_templates):
+                print(f"  {row['id']} -> {row['indonesian']} / {row['chinese']}")
 
     problems = []
     if len(rows) < 3020:
