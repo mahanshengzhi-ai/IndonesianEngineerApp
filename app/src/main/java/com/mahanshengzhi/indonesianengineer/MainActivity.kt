@@ -240,9 +240,13 @@ class MainActivity : AppCompatActivity() {
                 progress.dailyAudio(),
                 progress.dailyQuiz(),
                 progress.dailyTranslation(),
+                progress.dailySentences(),
+                progress.dailyScene(),
+                progress.isCheckedInToday(),
                 onStart = { bottomNavigation.selectedItemId = R.id.nav_learn },
                 onCheckIn = {},
-                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn }
+                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn },
+                onOpenPractice = { bottomNavigation.selectedItemId = R.id.nav_practice }
             )
         }
 
