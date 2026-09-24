@@ -247,18 +247,10 @@ def cache_path_for_title(title: str) -> Path:
 
 
 def duration_ms(path: Path) -> int:
-    result = subprocess.run(
-        [
-            "ffprobe", "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
-            str(path),
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return max(1, int(float(result.stdout.strip()) * 1000))
+    with wave.open(str(path), "rb") as wav:
+        frames = wav.getnframes()
+        rate = wav.getframerate()
+    return max(1, int(frames * 1000 / max(1, rate)))
 
 
 def download_and_normalize(
