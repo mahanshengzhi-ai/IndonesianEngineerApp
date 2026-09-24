@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/nav_home" android:icon="@drawable/ic_home" android:title="首页" />
+    <item android:id="@+id/nav_learn" android:icon="@drawable/ic_book" android:title="学习" />
+    <item android:id="@+id/nav_practice" android:icon="@drawable/ic_check" android:title="练习" />
+    <item android:id="@+id/nav_translate" android:icon="@drawable/ic_translate" android:title="翻译" />
+    <item android:id="@+id/nav_profile" android:icon="@drawable/ic_person" android:title="我的" />
+</menu>
