@@ -141,7 +141,8 @@ object TranslatePage {
             )
         }
 
-        val translateButton = Ui.button(context, "翻译") {
+        lateinit var translateButton: MaterialButton
+        translateButton = Ui.button(context, "翻译") {
             val text = input.text?.toString()?.trim().orEmpty()
             if (text.isEmpty()) {
                 Toast.makeText(context, "先输入一段文字", Toast.LENGTH_SHORT).show()
@@ -301,7 +302,7 @@ object TranslatePage {
         input: EditText,
         result: TextView,
         onDirectionChanged: () -> Unit
-    ): LinearLayout {
+    ): android.view.View {
         val box = LinearLayout(context).apply {
             orientation = LinearLayout.VERTICAL
             setOnClickListener {
