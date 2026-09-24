@@ -41,7 +41,7 @@ jobs:
 
       - name: Build real Indonesian audio pack
         run: |
-          python scripts/build_audio_pack.py --min-lines 3000 --max-lines 3200
+          python scripts/build_audio_pack.py --min-lines 3000 --max-lines 3000
           python scripts/validate_audio_pack.py --min-lines 3000
 
       - name: Setup Android SDK
