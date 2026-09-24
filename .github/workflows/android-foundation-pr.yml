@@ -21,7 +21,29 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Setup Android SDK
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Cache CC0 Indonesian audio sources
+        uses: actions/cache@v4
+        with:
+          path: .cache/indonesian-audio
+          key: indonesian-audio-v1-${{ hashFiles('scripts/build_audio_pack.py') }}
+          restore-keys: |
+            indonesian-audio-v1-
+
+      - name: Install audio build tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+
+      - name: Build real Indonesian audio pack
+        run: |
+          python scripts/build_audio_pack.py --min-lines 3000 --max-lines 3200
+          python scripts/validate_audio_pack.py --min-lines 3000
+
         uses: android-actions/setup-android@v4
 
       - name: Install Android API 36
@@ -38,6 +60,15 @@ jobs:
           gradle --version
           gradle :app:testDebugUnitTest :app:assembleDebug --stacktrace
 
+
+      - name: Upload audio audit
+        uses: actions/upload-artifact@v7
+        with:
+          name: IndonesianEngineer-audio-audit
+          path: |
+            build/audio/audio_build_report.json
+            build/audio/audio_validation_report.json
+            app/src/main/assets/tts_index.tsv
       - name: Upload foundation APK
         uses: actions/upload-artifact@v7
         with:
