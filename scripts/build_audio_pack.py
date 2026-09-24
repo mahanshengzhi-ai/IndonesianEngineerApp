@@ -297,57 +297,46 @@ def make_concat_audio(
     selected: list[dict[str, Any]],
     temp_root: Path,
     output_path: Path,
-    dataset_zip: zipfile.ZipFile,
 ) -> list[dict[str, Any]]:
     pause_frames = b"\x00\x00" * round(24000 * PAUSE_MS / 1000)
-    zip_names = build_zip_name_map(dataset_zip)
-
-    normalized_cache: dict[int, tuple[bytes, int]] = {}
-    fallback_dir = temp_root / "fallback"
-    fallback_dir.mkdir(parents=True, exist_ok=True)
+    jobs = list(enumerate(selected, start=1))
+    prepared: dict[int, tuple[dict[str, Any], bytes, int]] = {}
 
     def prepare(
         number: int,
         item: dict[str, Any],
-    ) -> tuple[int, bytes, int]:
-        member_name = zip_names.get(item["title"])
-        if member_name:
-            with dataset_zip.open(member_name, "r") as source:
-                raw = source.read()
-        else:
-            raw_path = fallback_dir / (
-                hashlib.sha1(item["title"].encode("utf-8")).hexdigest() + ".wav"
-            )
-            download_file(item["url"], raw_path)
-            raw = raw_path.read_bytes()
+    ) -> tuple[int, dict[str, Any], bytes, int]:
+        raw_path = temp_root / (
+            hashlib.sha1(item["title"].encode("utf-8")).hexdigest() + ".wav"
+        )
+        download_file(item["url"], raw_path)
+        frames, duration_ms = normalize_wav_bytes(raw_path.read_bytes())
+        return number, item, frames, duration_ms
 
-        frames, duration_ms = normalize_wav_bytes(raw)
-        return number, frames, duration_ms
-
-    jobs = list(enumerate(selected, start=1))
-    with ThreadPoolExecutor(max_workers=min(12, max(2, len(jobs)))) as executor:
+    with ThreadPoolExecutor(max_workers=min(8, max(2, len(jobs)))) as executor:
         futures = [
             executor.submit(prepare, number, item)
             for number, item in jobs
         ]
         completed = 0
         for future in as_completed(futures):
-            number, frames, duration_ms = future.result()
-            normalized_cache[number] = (frames, duration_ms)
+            number, item, frames, duration_ms = future.result()
+            prepared[number] = (item, frames, duration_ms)
             completed += 1
             if completed % 250 == 0 or completed == len(jobs):
-                print(f"Normalized audio {completed}/{len(jobs)}")
+                print(f"Prepared audio {completed}/{len(jobs)}")
 
-    temp_pcm = temp_root / "combined.wav"
-    with wave.open(str(temp_pcm), "wb") as combined:
+    combined_path = temp_root / "combined.wav"
+    rows: list[dict[str, Any]] = []
+    running_ms = 0
+
+    with wave.open(str(combined_path), "wb") as combined:
         combined.setnchannels(1)
         combined.setsampwidth(2)
         combined.setframerate(24000)
 
-        rows: list[dict[str, Any]] = []
-        running_ms = 0
-        for number, item in jobs:
-            frames, duration_ms = normalized_cache[number]
+        for number in range(1, len(jobs) + 1):
+            item, frames, duration_ms = prepared[number]
             combined.writeframes(frames)
             rows.append({
                 "sha256": sha256(item["target_text"]),
@@ -359,7 +348,6 @@ def make_concat_audio(
                 "license": "CC0-1.0",
             })
             running_ms += duration_ms
-
             if number != len(jobs):
                 combined.writeframes(pause_frames)
                 running_ms += PAUSE_MS
@@ -367,14 +355,13 @@ def make_concat_audio(
     output_path.parent.mkdir(parents=True, exist_ok=True)
     run([
         "ffmpeg", "-y", "-loglevel", "error",
-        "-i", str(temp_pcm),
+        "-i", str(combined_path),
         "-c:a", "aac",
         "-b:a", "48k",
         "-movflags", "+faststart",
         str(output_path),
     ])
     return rows
-
 
 def main() -> int:
     parser = argparse.ArgumentParser()
