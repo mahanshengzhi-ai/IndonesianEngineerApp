@@ -24,12 +24,11 @@ jobs:
           unzip -q /tmp/gradle.zip -d /opt
           echo "/opt/gradle-8.13/bin" >> "$GITHUB_PATH"
 
+      - name: Validate content and forbidden APIs
+        run: python3 scripts/validate_content.py
+
       - name: Build debug APK
         run: gradle :app:assembleDebug --stacktrace
-
-      - name: Scan forbidden runtime speech APIs
-        run: |
-          ! grep -RInE 'TextToSpeech|SpeechRecognizer|RecognizerIntent|RECORD_AUDIO|MediaPlayer|sherpa-onnx|onnx|espeak' app --exclude-dir=build
 
       - name: Upload debug APK
         uses: actions/upload-artifact@v4
