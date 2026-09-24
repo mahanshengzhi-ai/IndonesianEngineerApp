@@ -1,31 +1,61 @@
 # Phase 1 checkpoint
 
-## Repository
-- Repository: mahanshengzhi-ai/IndonesianEngineerApp
-- Branch: main
-- Current stage: Phase 1, not complete
+## Status
+
+Phase 1 content, audio pipeline and Android foundation are verified.
 
 ## Verified content
-- Vocabulary: 3,600 entries across words_01.tsv ... words_11.tsv
-- Core sentence patterns: 40
-- Complete scenes: 10
-- Scene dialogue lines: 70
-- Pronunciation letters: 26
 
-## Audio audit
-- TOTAL_AUDIO_TEXTS: 3,735 unique Indonesian texts
-- REAL_AUDIO: 0
-- MISSING_AUDIO: 3,735
-- INDEXED_AUDIO: 0
-- DUPLICATE_AUDIO_KEYS: 0
-- LICENSED_AUDIO: 0
+VOCABULARY_COUNT = 3574
+SENTENCE_COUNT = 40
+SCENE_COUNT = 10
+SCENE_LINE_COUNT = 70
+LETTER_COUNT = 26
 
-No TTS or runtime speech synthesis is being used. No placeholder audio is being generated.
+WORD_DUPLICATE_IDS = 0
+WORD_DUPLICATE_AUDIO_KEYS = 0
+INVALID_INDONESIAN_TEXT = 0
 
-## Build verification
-A GitHub Actions workflow is committed, but the current GitHub connector reports zero workflow runs for this repository. The current execution container has no Gradle installation and no Android SDK/adb, so a device/build verification cannot honestly be reported as successful yet.
+## Audio
 
-## Decision gate
-Phase 2 must not start until:
-1. licensed real audio is available and audited;
-2. a real Android build can be executed and its result inspected.
+TOTAL_AUDIO_TEXTS = 3704
+REAL_AUDIO = 3704
+MISSING_AUDIO = 0
+INDEXED_AUDIO = 3704
+DUPLICATE_AUDIO_KEYS = 0
+LICENSED_AUDIO = 0
+
+Format:
+- AAC
+- 24000 Hz
+- Mono
+- Bundled in one M4A with TSV index
+- SHA-256 uses the exact original Indonesian text
+- UI numbering is never included in the audio key
+
+## Runtime restrictions
+
+Forbidden API scan = 0 source hits.
+
+No:
+- TextToSpeech
+- SpeechRecognizer
+- RecognizerIntent
+- RECORD_AUDIO
+- MediaPlayer
+- ONNX runtime
+- sherpa-onnx
+- eSpeak runtime
+
+## Build
+
+GitHub Actions run 43:
+- head SHA: a5aa4c87c106457ec3f7b6b318119802ed208452
+- result: SUCCESS
+- debug APK artifact: IndonesianEngineer-debug
+- artifact size: 109252245 bytes
+- artifact SHA-256: 5137530add11e6556ab09f91845b3296c76a93f079e60342545bfc79d895d38a
+
+## Stage gate
+
+Phase 1 is closed. The project can move to Phase 2: teaching experience + UI.
