@@ -287,18 +287,20 @@ class MainActivity : AppCompatActivity() {
             gravity = Gravity.CENTER_VERTICAL
         })
 
-        playerPositionText = TextView(this).apply {
+        val positionLabel = TextView(this).apply {
             textSize = 12f
-            setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-            text = "0:00"
+            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_secondary))
+            setText("0:00", TextView.BufferType.NORMAL)
         }
+        playerPositionText = positionLabel
 
-        playerDurationText = TextView(this).apply {
+        val durationLabel = TextView(this).apply {
             textSize = 12f
-            setTextColor(ContextCompat.getColor(context, R.color.text_secondary))
-            text = "0:00"
+            setTextColor(ContextCompat.getColor(this@MainActivity, R.color.text_secondary))
+            setText("0:00", TextView.BufferType.NORMAL)
             gravity = Gravity.END
         }
+        playerDurationText = durationLabel
 
         val timeRow = LinearLayout(this).apply {
             orientation = LinearLayout.HORIZONTAL
