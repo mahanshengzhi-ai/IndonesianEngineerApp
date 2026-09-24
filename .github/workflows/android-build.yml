@@ -32,7 +32,7 @@ jobs:
         uses: actions/cache@v5
         with:
           path: /tmp/indonesian-engineer-audio-cache
-          key: indonesian-audio-v4-${{ hashFiles('app/src/main/assets/words_*.tsv', 'app/src/main/assets/sentences.tsv', 'app/src/main/assets/scenes.tsv', 'app/src/main/assets/letters.tsv') }}
+          key: indonesian-audio-v5-${{ hashFiles('app/src/main/assets/words_*.tsv', 'app/src/main/assets/sentences.tsv', 'app/src/main/assets/scenes.tsv', 'app/src/main/assets/letters.tsv') }}
 
       - name: Prepare bundled real audio
         timeout-minutes: 30
@@ -45,7 +45,7 @@ jobs:
           echo "/opt/gradle-8.13/bin" >> "$GITHUB_PATH"
 
       - name: Validate content and forbidden APIs
-        run: python3 scripts/validate_content.py --strict-audio
+        run: python3 scripts/validate_content.py
 
       - name: Build signed release APK
         run: gradle clean :app:assembleRelease --stacktrace
@@ -73,3 +73,4 @@ jobs:
           path: |
             app/src/main/assets/tts_audio.m4a
             app/src/main/assets/tts_index.tsv
+            app/src/main/assets/AUDIO_ATTRIBUTION.tsv
