@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: android-build-main-v2
+  group: android-build-main-v3
   cancel-in-progress: true
 
 jobs:
@@ -31,11 +31,29 @@ jobs:
       - name: Validate content and forbidden APIs
         run: python3 scripts/validate_content.py
 
-      - name: Build debug APK
-        run: gradle :app:assembleDebug --stacktrace
+      - name: Build signed release APK
+        run: gradle clean :app:assembleRelease --stacktrace
 
-      - name: Upload debug APK
+      - name: Verify APK signature
+        run: |
+          APK="app/build/outputs/apk/release/app-release.apk"
+          $ANDROID_HOME/build-tools/35.0.0/apksigner verify --verbose "$APK"
+
+      - name: Verify APK alignment
+        run: |
+          APK="app/build/outputs/apk/release/app-release.apk"
+          $ANDROID_HOME/build-tools/35.0.0/zipalign -c -P 16 -v 4 "$APK"
+
+      - name: Upload release APK
         uses: actions/upload-artifact@v7
         with:
-          name: IndonesianEngineer-debug
-          path: app/build/outputs/apk/debug/*.apk
+          name: IndonesianEngineer-release
+          path: app/build/outputs/apk/release/app-release.apk
+
+      - name: Upload build metadata
+        uses: actions/upload-artifact@v7
+        with:
+          name: IndonesianEngineer-release-metadata
+          path: |
+            app/build/outputs/mapping/release/**
+            app/build/outputs/apk/release/output-metadata.json
