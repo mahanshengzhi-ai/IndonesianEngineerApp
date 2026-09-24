@@ -1,0 +1,11 @@
+id	title	description	speaker_a	speaker_b
+SC01	第一次到工地	报到、认识现场人员、确认工作区域	Selamat pagi. Saya dari tim teknik.	Selamat pagi. Silakan ikut saya.
+SC02	材料进场	确认材料数量、型号与卸货位置	Materialnya sudah datang?	Sudah. Tolong cek jumlah dan ukurannya.
+SC03	图纸确认	和同事确认图纸版本与尺寸	Kita pakai gambar revisi yang mana?	Gunakan revisi terbaru ini.
+SC04	安全交底	进入施工区域前进行基本安全提醒	Hati-hati. Pakai helm dan sepatu keselamatan.	Baik, saya mengerti.
+SC05	混凝土浇筑	浇筑开始前确认配合和检查事项	Betonnya siap dicor?	Sudah siap. Kita mulai setelah pemeriksaan.
+SC06	测量放样	确认基准点和放样位置	Titik referensinya di mana?	Di sana. Tolong cek kembali koordinatnya.
+SC07	餐厅	点餐和确认饮料	Mau makan apa?	Saya mau nasi dan air putih.
+SC08	打车	说明目的地和确认价格	Tolong antar saya ke hotel ini.	Baik, Pak. Kita berangkat sekarang.
+SC09	问路	确认方向和距离	Permisi, stasiun di mana?	Lurus, lalu belok kiri.
+SC10	日报 / 会议	汇报今天完成的工作	Apa yang kita selesaikan hari ini?	Kita menyelesaikan pekerjaan fondasi.
