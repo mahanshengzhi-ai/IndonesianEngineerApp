@@ -60,18 +60,31 @@ def dataset_path() -> Path:
 
 
 def download_dataset(path: Path) -> None:
-    if path.exists() and path.stat().st_size > 1_000_000:
+    if path.exists() and path.stat().st_size > 1_000_000 and zipfile.is_zipfile(path):
         return
 
+    path.unlink(missing_ok=True)
     tmp = path.with_suffix(".part")
-    session = requests.Session()
-    session.headers["User-Agent"] = UA
-    with session.get(DATASET_URL, timeout=300, stream=True) as response:
-        response.raise_for_status()
-        with tmp.open("wb") as out:
-            for chunk in response.iter_content(1024 * 256):
-                if chunk:
-                    out.write(chunk)
+    subprocess.run(
+        [
+            "curl", "-fL",
+            "--retry", "6",
+            "--retry-delay", "3",
+            "--connect-timeout", "30",
+            "--max-time", "600",
+            "-A", UA,
+            "-o", str(tmp),
+            DATASET_URL,
+        ],
+        check=True,
+    )
+    if not zipfile.is_zipfile(tmp):
+        with tmp.open("rb") as f:
+            head = f.read(32)
+        raise RuntimeError(
+            "LinguaLibre dataset download is not a ZIP; "
+            f"size={tmp.stat().st_size}, first_bytes={head!r}"
+        )
     tmp.replace(path)
 
 
