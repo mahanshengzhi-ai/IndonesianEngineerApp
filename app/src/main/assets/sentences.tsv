@@ -1,0 +1,9 @@
+id	indonesian	chinese	scene	explanation	example
+S01	Saya sudah memeriksa gambar ini.	我已经检查过这张图纸了。	图纸确认	sudah 表示已经发生或完成的动作	Saya sudah memeriksa gambar ini.
+S02	Tolong cek ukuran ini.	请检查一下这个尺寸。	测量放样	tolong 用于礼貌请求	Tolong cek ukuran ini.
+S03	Kita mulai pekerjaan setelah material datang.	材料到场后我们开始施工。	材料进场	setelah 表示在某事之后	Kita mulai pekerjaan setelah material datang.
+S04	Ada masalah di sini.	这里有一个问题。	质量检查	ada 表示“有、存在”	Ada masalah di sini.
+S05	Hati-hati, area ini masih berbahaya.	小心，这个区域仍然危险。	安全交底	hati-hati 用于提醒注意安全	Hati-hati, area ini masih berbahaya.
+S06	Bisa ulangi sekali lagi?	可以再说一遍吗？	现场沟通	bisa 表示能够、可以	Bisa ulangi sekali lagi?
+S07	Menurut saya, ukuran ini terlalu kecil.	我觉得这个尺寸太小了。	图纸确认	menurut saya 表示“在我看来”	Menurut saya, ukuran ini terlalu kecil.
+S08	Kapan pekerjaan ini selesai?	这项工作什么时候完成？	进度沟通	kapan 用于询问时间	Kapan pekerjaan ini selesai?
