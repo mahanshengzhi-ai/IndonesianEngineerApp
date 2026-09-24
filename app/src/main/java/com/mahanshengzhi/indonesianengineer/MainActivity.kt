@@ -7,6 +7,7 @@ import android.widget.FrameLayout
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import androidx.media3.common.util.UnstableApi
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.mahanshengzhi.indonesianengineer.audio.AudioPlayer
 import com.mahanshengzhi.indonesianengineer.data.LearningRepository
@@ -29,6 +30,7 @@ import com.mahanshengzhi.indonesianengineer.ui.pages.WordDetailPage
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+@OptIn(UnstableApi::class)
 class MainActivity : AppCompatActivity() {
 
     enum class LearnModule {
