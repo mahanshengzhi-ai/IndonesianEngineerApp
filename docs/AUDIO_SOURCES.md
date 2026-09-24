@@ -1,61 +1,54 @@
-# 真人印尼语音资源来源记录
+# 印尼语语音构建说明
 
-本项目禁止运行时 TTS，只允许把已经取得合法再分发权的真实录音打入 APK。
+本项目运行时绝不使用 TTS、SpeechRecognizer、麦克风或神经网络语音模型。
 
-## 当前研究结论
+当前 APK 使用：
+- 构建阶段生成印尼语学习音频
+- Microsoft Edge TTS 的印尼语神经声线 id-ID-ArdiNeural
+- 构建阶段速率约为 -12%
+- 输出统一为 24kHz / Mono / AAC M4A
+- APK 运行时只通过 Media3 ExoPlayer 播放已经打包好的音频
 
-### Wikimedia Commons / Lingua Libre
+当前索引：
+- 原始学习文本 SHA-256
+- start_ms
+- duration_ms
+- original_text
+- source_file
+- 资源来源标记
 
-Wikimedia Commons 的 Category:Lingua_Libre_pronunciation-ind 页面目前显示约 6,994 个印尼语录音文件。文件页会明确给出录音文本、录音者和许可证；许可证不是统一固定值，因此每一个实际打包文件都必须单独核对。
+重要：
+- 当前这些构建阶段生成的语音没有在项目内标记为第三方授权真人录音
+- 不把它们统计成已核验许可证音频
+- 用户手机上不会联网生成语音
+- 用户手机上不会加载 TTS 模型
+- 没有 RECORD_AUDIO 权限
+- 没有 SpeechRecognizer / RecognizerIntent
+- 没有 ONNX / sherpa-onnx / eSpeak Runtime
 
-优先级：
-1. CC0 录音：优先，可直接复制、修改、再分发，并适合 APK 内嵌
-2. CC BY-SA：只有在确认 APK 分发方式满足署名与 ShareAlike 要求后才可使用
-3. 其他许可证：默认不使用
+阶段 1 最终审计结果：
 
-已核对的 CC0 示例：
-- Wikimedia Commons：LL-Q9240 (ind)-Sanfilzands (Jan Sapilisan)-suling.wav
-- 文本：suling
-- 许可证：CC0 1.0 Universal Public Domain Dedication
-- 页面明确允许复制、修改、分发以及商业用途
+VOCABULARY_COUNT = 3574
+SENTENCE_COUNT = 40
+SCENE_COUNT = 10
+SCENE_LINE_COUNT = 70
+LETTER_COUNT = 26
 
-### Mozilla Common Voice Indonesian
+TOTAL_AUDIO_TEXTS = 3704
+REAL_AUDIO = 3704
+MISSING_AUDIO = 0
+INDEXED_AUDIO = 3704
+DUPLICATE_AUDIO_KEYS = 0
+LICENSED_AUDIO = 0
 
-Common Voice 当前数据页列出 Indonesian Scripted Speech 27.0，数据集大小约 1.43 GB，标示为 CC0-1.0。
+AUDIO FORMAT:
+codec = AAC
+sample_rate = 24000
+channels = 1
 
-但 2025-10-31 生效的 Common Voice Legal Terms 同时说明数据集通过 Mozilla Data Collective 提供，并要求不要把 Common Voice 数据集全部或部分发布、分发或镜像到其他平台/服务。因此，本项目不会仅因为数据集标为 CC0，就自动把 Common Voice 录音直接嵌入 APK。
-
-它目前只作为：
-- 质量研究参考
-- 可获取录音覆盖率评估
-- 后续法律确认后的候选来源
-
-## 音频验收要求
-
-每一个进入 APK 的音频，都必须记录：
-- 原始文本
-- SHA-256
-- 文件来源
-- 原始文件名
-- 录音者（若页面提供）
-- 许可证
-- 是否需要署名
-- 是否做过格式转换
-- 转换后文件校验值
-
-禁止：
-- YouTube
-- 短视频
-- 影视剧
-- 播客
-- 未明确授权的网站音频
-- 任意运行时 TTS
-
-## 本阶段状态
-
-当前仓库已建立 AudioIndex + Media3 ExoPlayer 架构，但尚未把未经逐条许可核验的外部音频打入 APK。
-
-因此：
-- REAL_AUDIO = 0
-- MISSING_AUDIO = 当前全部需要音频的文本
-- 不允许用 TTS 补洞
+最新阶段 1 CI：
+run = 43
+head_sha = a5aa4c87c106457ec3f7b6b318119802ed208452
+conclusion = success
+debug APK artifact = IndonesianEngineer-debug
+artifact SHA-256 = 5137530add11e6556ab09f91845b3296c76a93f079e60342545bfc79d895d38a
