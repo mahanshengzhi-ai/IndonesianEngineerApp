@@ -23,6 +23,7 @@ import shutil
 import subprocess
 import tempfile
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -274,18 +275,22 @@ def make_concat_audio(
         str(pause_file),
     ])
 
-    concat_entries: list[Path] = []
-    rows: list[dict[str, Any]] = []
-    running_ms = 0
-
+    jobs: list[tuple[int, dict[str, Any], Path, Path]] = []
     for number, item in enumerate(selected, start=1):
-        cache_file = Path(item["cache_path"])
-        raw_file = temp_root / f"raw_{number}.wav"
-        normalized_file = normalized_dir / f"{number:04d}.wav"
+        jobs.append((
+            number,
+            item,
+            temp_root / f"raw_{number}.wav",
+            normalized_dir / f"{number:04d}.wav",
+        ))
 
+    def prepare(
+        job: tuple[int, dict[str, Any], Path, Path]
+    ) -> tuple[int, dict[str, Any], Path, int]:
+        number, item, raw_file, normalized_file = job
+        cache_file = Path(item["cache_path"])
         download_file(item["url"], cache_file)
         shutil.copy2(cache_file, raw_file)
-
         run([
             "ffmpeg", "-y", "-loglevel", "error",
             "-i", str(raw_file),
@@ -294,8 +299,27 @@ def make_concat_audio(
             "-sample_fmt", "s16",
             str(normalized_file),
         ])
-
         duration_ms = max(1, round(ffprobe_duration(normalized_file) * 1000))
+        return number, item, normalized_file, duration_ms
+
+    prepared: dict[int, tuple[dict[str, Any], Path, int]] = {}
+    max_workers = min(6, max(2, len(jobs)))
+    with ThreadPoolExecutor(max_workers=max_workers) as executor:
+        futures = [executor.submit(prepare, job) for job in jobs]
+        completed = 0
+        for future in as_completed(futures):
+            number, item, normalized_file, duration_ms = future.result()
+            prepared[number] = (item, normalized_file, duration_ms)
+            completed += 1
+            if completed % 100 == 0 or completed == len(jobs):
+                print(f"Prepared audio {completed}/{len(jobs)}")
+
+    concat_entries: list[Path] = []
+    rows: list[dict[str, Any]] = []
+    running_ms = 0
+
+    for number in range(1, len(jobs) + 1):
+        item, normalized_file, duration_ms = prepared[number]
         rows.append({
             "sha256": sha256(item["target_text"]),
             "start_ms": running_ms,
@@ -305,9 +329,8 @@ def make_concat_audio(
             "source_url": item["source_url"],
             "license": "CC0-1.0",
         })
-
         concat_entries.append(normalized_file)
-        if number != len(selected):
+        if number != len(jobs):
             concat_entries.append(pause_file)
         running_ms += duration_ms + PAUSE_MS
 
