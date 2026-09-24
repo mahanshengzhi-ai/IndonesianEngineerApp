@@ -13,8 +13,8 @@ android {
         applicationId = "com.mahanshengzhi.indonesianengineer"
         minSdk = 26
         targetSdk = 36
-        versionCode = 2
-        versionName = "0.2.0"
+        versionCode = 3
+        versionName = "0.3.0"
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
@@ -25,7 +25,6 @@ android {
 
     buildTypes {
         release {
-            // A locally signed release is required because the user needs an directly installable APK.
             signingConfig = signingConfigs.getByName("debug")
             isMinifyEnabled = false
             isShrinkResources = false
