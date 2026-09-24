@@ -7,6 +7,7 @@ import hashlib
 import os
 import shutil
 import subprocess
+import shlex
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -158,7 +159,7 @@ def main() -> None:
             "BUILD_TIME_SYNTHETIC_VOICE",
         ))
         list_lines.append(f"file '{path.as_posix().replace("'", "'\\''")}'")
-        list_lines.append(f"file '{silence.as_posix()}'")
+        list_lines.append(f"file {shlex.quote(silence.as_posix())}")
         current_ms += duration_ms + PAUSE_MS
 
     concat_list.write_text("\n".join(list_lines) + "\n", encoding="utf-8")
