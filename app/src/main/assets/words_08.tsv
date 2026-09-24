@@ -15,13 +15,11 @@ W0140	persiapan fondasi	基础准备	结构	结构
 W0151	pekerjaan tanah dasar	地基作业	土建	土建		
 W0162	kualitas tanah dasar	地基质量	土建	土建		
 W0173	perbaikan pekerjaan tanah	修复土方	土建	土建		
-W0184	jadwal pekerjaan tanah	土方计划	土建	土建		
+W0184	rencana pekerjaan tanah	土方计划	土建	土建		
 W0195	pengukuran galian fondasi	测量基坑	土建	土建		
-W0206	hasil galian fondasi	基坑结果	土建	土建		
 W0217	lereng	边坡	土建	土建		
 W0228	gambar lereng	边坡图纸	土建	土建		
 W0239	lereng utama	主要边坡	土建	土建		
-W0250	posisi dinding penahan tanah	挡土墙位置	土建	土建		
 W0261	pemeriksaan akhir dinding penahan tanah	挡土墙最终检查	土建	土建		
 W0272	kondisi pagar	围墙状态	土建	土建		
 W0283	spesifikasi pagar	围墙规格	土建	土建		
@@ -39,13 +37,11 @@ W0404	persiapan semen	水泥准备	材料	材料
 W0415	pekerjaan pasir	砂作业	材料	材料		
 W0426	kualitas pasir	砂质量	材料	材料		
 W0437	perbaikan batu pecah	修复碎石	材料	材料		
-W0448	jadwal batu pecah	碎石计划	材料	材料		
+W0448	rencana batu pecah	碎石计划	材料	材料		
 W0459	pengukuran agregat	测量骨料	材料	材料		
-W0470	hasil agregat	骨料结果	材料	材料		
 W0481	tulangan	钢筋	钢筋	钢筋		
 W0492	gambar tulangan	钢筋图纸	钢筋	钢筋		
 W0503	tulangan utama	主要钢筋	钢筋	钢筋		
-W0514	posisi keranjang tulangan	钢筋笼位置	钢筋	钢筋		
 W0525	pemeriksaan akhir keranjang tulangan	钢筋笼最终检查	钢筋	钢筋		
 W0536	kondisi sengkang	箍筋状态	钢筋	钢筋		
 W0547	spesifikasi sengkang	箍筋规格	钢筋	钢筋		
@@ -63,26 +59,22 @@ W0668	persiapan baut	螺栓准备	钢结构	钢结构
 W0679	pekerjaan jahitan las	焊缝作业	钢结构	钢结构		
 W0690	kualitas jahitan las	焊缝质量	钢结构	钢结构		
 W0701	perbaikan pengelasan	修复焊接	钢结构	钢结构		
-W0712	jadwal pengelasan	焊接计划	钢结构	钢结构		
+W0712	rencana pengelasan	焊接计划	钢结构	钢结构		
 W0723	pengukuran bekisting	测量模板	模板	模板		
-W0734	hasil bekisting	模板结果	模板	模板		
 W0745	bekisting kayu	木模板	模板	模板		
 W0756	gambar bekisting kayu	木模板图纸	模板	模板		
 W0767	bekisting kayu utama	主要木模板	模板	模板		
-W0778	posisi bekisting baja	钢模板位置	模板	模板		
 W0789	pemeriksaan akhir bekisting baja	钢模板最终检查	模板	模板		
 W0800	lokasi pemasangan bekisting	支模位置	模板	模板		
 W0811	persiapan pemasangan bekisting	支模准备	模板	模板		
 W0822	pekerjaan pembongkaran bekisting	拆模作业	模板	模板		
 W0833	kualitas pembongkaran bekisting	拆模质量	模板	模板		
 W0844	perbaikan perancah	修复脚手架	脚手架	脚手架		
-W0855	jadwal perancah	脚手架计划	脚手架	脚手架		
+W0855	rencana perancah	脚手架计划	脚手架	脚手架		
 W0866	pengukuran tiang vertikal	测量立杆	脚手架	脚手架		
-W0877	hasil tiang vertikal	立杆结果	脚手架	脚手架		
 W0888	batang horizontal	横杆	脚手架	脚手架		
 W0899	gambar batang horizontal	横杆图纸	脚手架	脚手架		
 W0910	batang horizontal utama	主要横杆	脚手架	脚手架		
-W0921	posisi pengaku diagonal	剪刀撑位置	脚手架	脚手架		
 W0932	pemeriksaan akhir pengaku diagonal	剪刀撑最终检查	脚手架	脚手架		
 W0943	kondisi papan perancah	脚手板状态	脚手架	脚手架		
 W0954	spesifikasi papan perancah	脚手板规格	脚手架	脚手架		
@@ -100,13 +92,11 @@ W1075	persiapan plesteran	抹灰准备	装修	装修
 W1086	pekerjaan lantai	地面作业	装修	装修		
 W1097	kualitas lantai	地面质量	装修	装修		
 W1108	perbaikan dinding	修复墙面	装修	装修		
-W1119	jadwal dinding	墙面计划	装修	装修		
+W1119	rencana dinding	墙面计划	装修	装修		
 W1130	pengukuran plafon	测量天花板	装修	装修		
-W1141	hasil plafon	天花板结果	装修	装修		
 W1152	pintu dan jendela	门窗	装修	装修		
 W1163	gambar pintu dan jendela	门窗图纸	装修	装修		
 W1174	pintu dan jendela utama	主要门窗	装修	装修		
-W1185	posisi lapisan kedap air	防水层位置	防水	防水		
 W1196	pemeriksaan akhir lapisan kedap air	防水层最终检查	防水	防水		
 W1207	kondisi pipa	管道状态	管道	管道		
 W1218	spesifikasi pipa	管道规格	管道	管道		
@@ -124,13 +114,11 @@ W1339	persiapan flensa	法兰准备	管道	管道
 W1350	pekerjaan elbow	弯头作业	管道	管道		
 W1361	kualitas elbow	弯头质量	管道	管道		
 W1372	perbaikan tee	修复三通	管道	管道		
-W1383	jadwal tee	三通计划	管道	管道		
+W1383	rencana tee	三通计划	管道	管道		
 W1394	pengukuran sambungan	测量接头	管道	管道		
-W1405	hasil sambungan	接头结果	管道	管道		
 W1416	pompa air	水泵	水利	水利		
 W1427	gambar pompa air	水泵图纸	水利	水利		
 W1438	pompa air utama	主要水泵	水利	水利		
-W1449	posisi tangki air	水箱位置	水利	水利		
 W1460	pemeriksaan akhir tangki air	水箱最终检查	水利	水利		
 W1471	kondisi sprinkler	喷头状态	灌溉	灌溉		
 W1482	spesifikasi sprinkler	喷头规格	灌溉	灌溉		
@@ -148,13 +136,11 @@ W1603	persiapan bangunan pengambilan	取水口准备	水利	水利
 W1614	pekerjaan bak penampung air	蓄水池作业	水利	水利		
 W1625	kualitas bak penampung air	蓄水池质量	水利	水利		
 W1636	perbaikan saluran	修复渠道	水利	水利		
-W1647	jadwal saluran	渠道计划	水利	水利		
+W1647	rencana saluran	渠道计划	水利	水利		
 W1658	pengukuran pintu air	测量闸门	水利	水利		
-W1669	hasil pintu air	闸门结果	水利	水利		
 W1680	jalan	道路	道路	道路		
 W1691	gambar jalan	道路图纸	道路	道路		
 W1702	jalan utama	主要道路	道路	道路		
-W1713	posisi badan jalan	路基位置	道路	道路		
 W1724	pemeriksaan akhir badan jalan	路基最终检查	道路	道路		
 W1735	kondisi permukaan jalan	路面状态	道路	道路		
 W1746	spesifikasi permukaan jalan	路面规格	道路	道路		
@@ -172,13 +158,11 @@ W1867	persiapan abutmen	桥台准备	桥梁	桥梁
 W1878	pekerjaan pilar jembatan	桥墩作业	桥梁	桥梁		
 W1889	kualitas pilar jembatan	桥墩质量	桥梁	桥梁		
 W1900	perbaikan balok dan pelat	修复梁板	桥梁	桥梁		
-W1911	jadwal balok dan pelat	梁板计划	桥梁	桥梁		
+W1911	rencana balok dan pelat	梁板计划	桥梁	桥梁		
 W1922	pengukuran peralatan	测量设备	机械	机械		
-W1933	hasil peralatan	设备结果	机械	机械		
 W1944	mesin	机械	机械	机械		
 W1955	gambar mesin	机械图纸	机械	机械		
 W1966	mesin utama	主要机械	机械	机械		
-W1977	posisi ekskavator	挖掘机位置	机械	机械		
 W1988	pemeriksaan akhir ekskavator	挖掘机最终检查	机械	机械		
 W1999	kondisi loader	装载机状态	机械	机械		
 W2010	spesifikasi loader	装载机规格	机械	机械		
@@ -196,13 +180,11 @@ W2131	persiapan kompresor udara	空压机准备	机械	机械
 W2142	pekerjaan mesin las	焊机作业	机电	机电		
 W2153	kualitas mesin las	焊机质量	机电	机电		
 W2164	perbaikan kabel	修复电缆	电气	电气		
-W2175	jadwal kabel	电缆计划	电气	电气		
+W2175	rencana kabel	电缆计划	电气	电气		
 W2186	pengukuran kabel listrik	测量电线	电气	电气		
-W2197	hasil kabel listrik	电线结果	电气	电气		
 W2208	panel distribusi	配电箱	电气	电气		
 W2219	gambar panel distribusi	配电箱图纸	电气	电气		
 W2230	panel distribusi utama	主要配电箱	电气	电气		
-W2241	posisi pemutus sirkuit	断路器位置	电气	电气		
 W2252	pemeriksaan akhir pemutus sirkuit	断路器最终检查	电气	电气		
 W2263	kondisi pembumian	接地状态	电气	电气		
 W2274	spesifikasi pembumian	接地规格	电气	电气		
@@ -218,15 +200,13 @@ W2373	risiko panel kontrol	控制柜风险	电气	电气
 W2384	lokasi motor listrik	电机位置	机电	机电		
 W2395	persiapan motor listrik	电机准备	机电	机电		
 W2406	pekerjaan pengukuran	测量作业	测量	测量		
-W2417	kualitas pengukuran	测量质量	测量	测量		
+W2417	kualitas hasil pengukuran	测量质量	测量	测量		
 W2428	perbaikan total station	修复全站仪	测量	测量		
-W2439	jadwal total station	全站仪计划	测量	测量		
-W2450	pengukuran alat ukur nivo	测量水准仪	测量	测量		
-W2461	hasil alat ukur nivo	水准仪结果	测量	测量		
+W2439	rencana total station	全站仪计划	测量	测量		
+W2450	pengukuran waterpass	测量水准仪	测量	测量		
 W2472	prisma	棱镜	测量	测量		
 W2483	gambar prisma	棱镜图纸	测量	测量		
 W2494	prisma utama	主要棱镜	测量	测量		
-W2505	posisi rambu ukur	测杆位置	测量	测量		
 W2516	pemeriksaan akhir rambu ukur	测杆最终检查	测量	测量		
 W2527	kondisi meteran	卷尺状态	测量	测量		
 W2538	spesifikasi meteran	卷尺规格	测量	测量		
@@ -244,26 +224,22 @@ W2659	persiapan pematokan	放样准备	测量	测量
 W2670	pekerjaan penampang	断面作业	测量	测量		
 W2681	kualitas penampang	断面质量	测量	测量		
 W2692	perbaikan azimut	修复方位角	测量	测量		
-W2703	jadwal azimut	方位角计划	测量	测量		
+W2703	rencana azimut	方位角计划	测量	测量		
 W2714	pengukuran jarak	测量距离	测量	测量		
-W2725	hasil jarak	距离结果	测量	测量		
 W2736	sudut	角度	测量	测量		
 W2747	gambar sudut	角度图纸	测量	测量		
 W2758	sudut utama	主要角度	测量	测量		
-W2769	posisi gambar kerja	图纸位置	技术	技术		
 W2780	pemeriksaan akhir gambar kerja	图纸最终检查	技术	技术		
 W2791	kondisi gambar konstruksi	施工图状态	技术	技术		
 W2802	spesifikasi gambar konstruksi	施工图规格	技术	技术		
 W2813	pemeliharaan gambar detail	维护详图	技术	技术		
 W2824	biaya gambar detail	详图费用	技术	技术		
 W2835	perbaikan gambar penampang	修复剖面图	技术	技术		
-W2846	jadwal gambar penampang	剖面图计划	技术	技术		
+W2846	rencana gambar penampang	剖面图计划	技术	技术		
 W2857	pengukuran gambar denah	测量平面图	技术	技术		
-W2868	hasil gambar denah	平面图结果	技术	技术		
 W2879	detail titik	节点	技术	技术		
 W2890	gambar detail titik	节点图纸	技术	技术		
 W2901	detail titik utama	主要节点	技术	技术		
-W2912	posisi ukuran	尺寸位置	技术	技术		
 W2923	pemeriksaan akhir ukuran	尺寸最终检查	技术	技术		
 W2934	kondisi simbol	符号状态	技术	技术		
 W2945	spesifikasi simbol	符号规格	技术	技术		
@@ -276,18 +252,16 @@ W3011	data batch	批次数据	材料管理	材料管理
 W3022	batch sementara	临时批次	材料管理	材料管理		
 W3033	ukuran sampel	样品尺寸	质量	质量		
 W3044	risiko sampel	样品风险	质量	质量		
-W3055	lokasi spesifikasi	规格位置	质量	质量		
 W3066	persiapan spesifikasi	规格准备	质量	质量		
 W3077	pekerjaan jumlah	数量作业	材料管理	材料管理		
 W3088	kualitas jumlah	数量质量	材料管理	材料管理		
 W3099	perbaikan kualitas	修复质量	质量	质量		
-W3110	jadwal kualitas	质量计划	质量	质量		
+W3110	rencana kualitas	质量计划	质量	质量		
 W3121	pengukuran pemeriksaan	测量检验	质量	质量		
 W3132	hasil pemeriksaan	检验结果	质量	质量		
 W3143	pengujian	试验	质量	质量		
 W3154	gambar pengujian	试验图纸	质量	质量		
 W3165	pengujian utama	主要试验	质量	质量		
-W3176	posisi pengambilan sampel	取样位置	质量	质量		
 W3187	pemeriksaan akhir pengambilan sampel	取样最终检查	质量	质量		
 W3198	kondisi laporan	报告状态	质量	质量		
 W3209	spesifikasi laporan	报告规格	质量	质量		
@@ -305,13 +279,11 @@ W3330	persiapan pagar pengaman	防护栏准备	安全	安全
 W3341	pekerjaan kemajuan	进度作业	进度	进度		
 W3352	kualitas kemajuan	进度质量	进度	进度		
 W3363	perbaikan rencana	修复计划	进度	进度		
-W3374	jadwal rencana	计划计划	进度	进度		
+W3374	rencana rencana	计划计划	进度	进度		
 W3385	pengukuran masa pelaksanaan	测量工期	进度	进度		
-W3396	hasil masa pelaksanaan	工期结果	进度	进度		
 W3407	milestone	里程碑	进度	进度		
 W3418	gambar milestone	里程碑图纸	进度	进度		
 W3429	milestone utama	主要里程碑	进度	进度		
-W3440	posisi laporan harian	日报位置	管理	管理		
 W3451	pemeriksaan akhir laporan harian	日报最终检查	管理	管理		
 W3462	kondisi rapat	会议状态	管理	管理		
 W3473	spesifikasi rapat	会议规格	管理	管理		
