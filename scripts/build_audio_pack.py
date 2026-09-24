@@ -297,9 +297,31 @@ def normalize_wav_bytes(raw: bytes) -> tuple[bytes, int]:
 def download_dataset_zip(cache_root: Path) -> Path:
     destination = cache_root / "Q305-ind-Indonesian.zip"
     if destination.exists() and destination.stat().st_size > 1_000_000:
-        return destination
+        if zipfile.is_zipfile(destination):
+            return destination
+        destination.unlink(missing_ok=True)
+
     print("Downloading Lingua Libre Indonesian dataset:", DATASET_URL)
-    download_file(DATASET_URL, destination)
+    run([
+        "curl",
+        "-fL",
+        "--retry", "5",
+        "--retry-delay", "2",
+        "--retry-all-errors",
+        "--connect-timeout", "20",
+        "--max-time", "300",
+        "-A", "Mozilla/5.0 IndonesianEngineerApp/0.7",
+        "-o", str(destination),
+        DATASET_URL,
+    ])
+
+    if not zipfile.is_zipfile(destination):
+        head = destination.read_bytes()[:160]
+        destination.unlink(missing_ok=True)
+        raise RuntimeError(
+            "Lingua Libre dataset download is not a valid ZIP: "
+            + repr(head)
+        )
     return destination
 
 
