@@ -184,7 +184,8 @@ def tokenize_phrase(text: str) -> list[str]:
 
 def cache_path_for_title(title: str) -> Path:
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    return CACHE_DIR / (hashlib.sha1(title.encode("utf-8")).hexdigest() + ".wav")
+    (CACHE_DIR / "wav_sources").mkdir(parents=True, exist_ok=True)
+    return CACHE_DIR / "wav_sources" / (hashlib.sha1(title.encode("utf-8")).hexdigest() + ".wav")
 
 
 def download_and_normalize(
@@ -286,11 +287,11 @@ def main() -> None:
         if exact_candidates:
             plans[key] = ("exact", exact_candidates)
             candidate_titles.update(exact_candidates)
-            continue
 
         tokens = tokenize_phrase(text)
         if not tokens:
-            plans[key] = None
+            if not exact_candidates:
+                plans[key] = None
             continue
 
         sources: list[str] = []
@@ -300,11 +301,13 @@ def main() -> None:
             if not candidates:
                 possible = False
                 break
-            # Retain up to four candidates per token, metadata filtering happens below.
-            sources.append("|".join(candidates))
+                sources.append("|".join(candidates))
             candidate_titles.update(candidates)
 
-        plans[key] = ("stitched", sources) if possible else None
+        if possible:
+            plans[key] = ("stitched", sources)
+        elif not exact_candidates:
+            plans[key] = None
 
     print("PLANNED_TEXTS =", sum(1 for plan in plans.values() if plan))
     print("UNIQUE_CANDIDATE_FILES =", len(candidate_titles))
@@ -414,9 +417,7 @@ def main() -> None:
                 for idx, title in enumerate(source_titles):
                     path = normalized_sources[title]
                     inputs.extend(["-i", str(path)])
-                    filter_parts.append(
-                        f"[{idx}:a]apad=pad_dur=0.08,atrim=duration={duration_ms(path)/1000.0:.3f}[a{idx}]"
-                    )
+                    filter_parts.append(f"[{idx}:a]apad=pad_dur=0.08[a{idx}]")
                 graph = ";".join(filter_parts)
                 mix_inputs = "".join(f"[a{i}]" for i in range(len(source_titles)))
                 graph += f";{mix_inputs}concat=n={len(source_titles)}:v=0:a=1[out]"
