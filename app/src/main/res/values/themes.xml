@@ -1,12 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.IndonesianEngineer" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.IndonesianEngineer" parent="Theme.Material3.Light.NoActionBar">
         <item name="android:fontFamily">sans</item>
         <item name="android:windowLightStatusBar">true</item>
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:statusBarColor">@color/page_background</item>
         <item name="android:navigationBarColor">@color/page_background</item>
+        <item name="android:navigationBarDividerColor">@color/card_stroke</item>
+        <item name="android:windowBackground">@color/page_background</item>
         <item name="android:windowActionModeOverlay">true</item>
         <item name="colorPrimary">@color/teal_primary</item>
+        <item name="colorOnPrimary">@android:color/white</item>
+        <item name="colorPrimaryContainer">@color/teal_light</item>
+        <item name="colorOnPrimaryContainer">@color/teal_deep</item>
         <item name="colorSecondary">@color/warm_orange</item>
+        <item name="colorSecondaryContainer">@color/warm_orange_light</item>
+        <item name="colorSurface">@android:color/white</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorSurfaceVariant">@color/card_green</item>
+        <item name="colorOutline">@color/card_stroke</item>
     </style>
 </resources>
