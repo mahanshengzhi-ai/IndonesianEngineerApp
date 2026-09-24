@@ -98,7 +98,8 @@ def main():
     print(f"MISSING_AUDIO = {len(missing)}")
     print(f"INDEXED_AUDIO = {len(index)}")
     print(f"DUPLICATE_AUDIO_KEYS = {duplicate_audio_keys}")
-    print(f"LICENSED_AUDIO = {0 if not index else len(index)}")
+    licensed = sum(1 for row in index.values() if row.get("license", "").strip())
+    print(f"LICENSED_AUDIO = {licensed}")
     print(f"AUDIO_ASSET_PRESENT = {(ASSETS / 'tts_audio.m4a').exists()}")
 
     forbidden_hits = scan_forbidden()
@@ -113,7 +114,12 @@ def main():
         problems.append(f"SENTENCE_COUNT != 40 ({len(sentences)})")
     if len(set(r["scene_id"] for r in scenes)) != 10:
         problems.append("SCENE_COUNT != 10")
-    if any(int(r.get("turn", "0") or 0) < 6 for r in scenes if r.get("turn")):
+    scene_turn_counts = {}
+    for row in scenes:
+        sid = row.get("scene_id", "")
+        turn = int(row.get("turn", "0") or 0)
+        scene_turn_counts[sid] = max(scene_turn_counts.get(sid, 0), turn)
+    if any(count < 6 for count in scene_turn_counts.values()):
         problems.append("A_SCENE_HAS_FEWER_THAN_6_TURNS")
     if len(letters) != 26:
         problems.append(f"LETTER_COUNT != 26 ({len(letters)})")
