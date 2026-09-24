@@ -44,6 +44,7 @@ jobs:
           python scripts/build_audio_pack.py --min-lines 3000 --max-lines 3200
           python scripts/validate_audio_pack.py --min-lines 3000
 
+      - name: Setup Android SDK
         uses: android-actions/setup-android@v4
 
       - name: Install Android API 36
@@ -69,6 +70,7 @@ jobs:
             build/audio/audio_build_report.json
             build/audio/audio_validation_report.json
             app/src/main/assets/tts_index.tsv
+
       - name: Upload foundation APK
         uses: actions/upload-artifact@v7
         with:
