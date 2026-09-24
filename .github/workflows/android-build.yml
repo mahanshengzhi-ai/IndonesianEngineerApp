@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: android-build-main-v3
+  group: android-build-main-v4
   cancel-in-progress: true
 
 jobs:
@@ -22,7 +22,23 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      - name: Install Gradle 8.13
+      - name: Prepare audio tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python3 -m pip install --user requests
+
+      - name: Restore audio build cache
+        uses: actions/cache@v5
+        with:
+          path: /tmp/indonesian-engineer-audio-cache
+          key: indonesian-audio-v2-${{ hashFiles('app/src/main/assets/words_*.tsv', 'app/src/main/assets/sentences.tsv', 'app/src/main/assets/scenes.tsv', 'app/src/main/assets/letters.tsv') }}
+
+      - name: Prepare bundled real audio
+        timeout-minutes: 30
+        run: AUDIO_CACHE_DIR=/tmp/indonesian-engineer-audio-cache python3 scripts/prepare_wikimedia_audio.py
+
+      - name: Set up Gradle 8.13
         run: |
           curl -fsSL -o /tmp/gradle.zip https://services.gradle.org/distributions/gradle-8.13-bin.zip
           unzip -q /tmp/gradle.zip -d /opt
@@ -50,10 +66,10 @@ jobs:
           name: IndonesianEngineer-release
           path: app/build/outputs/apk/release/app-release.apk
 
-      - name: Upload build metadata
+      - name: Upload audio audit data
         uses: actions/upload-artifact@v7
         with:
-          name: IndonesianEngineer-release-metadata
+          name: IndonesianEngineer-audio
           path: |
-            app/build/outputs/mapping/release/**
-            app/build/outputs/apk/release/output-metadata.json
+            app/src/main/assets/tts_audio.m4a
+            app/src/main/assets/tts_index.tsv
