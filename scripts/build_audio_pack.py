@@ -54,7 +54,6 @@ def request_json(params: dict[str, Any], retries: int = 8) -> dict[str, Any]:
             headers={
                 "User-Agent": USER_AGENT,
                 "Accept": "application/json",
-                "Accept-Encoding": "gzip",
             },
         )
         try:
