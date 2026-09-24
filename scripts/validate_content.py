@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -21,25 +22,30 @@ FORBIDDEN = (
     "espeak",
 )
 
+CJK_PATTERN = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
+
+
 def read_tsv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as f:
         return list(csv.DictReader(f, delimiter="\t"))
 
+
 def sha256(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
+
 def collect_audio_texts(words, sentences, scenes, letters):
-    texts = []
+    texts: list[str] = []
     texts.extend(r["indonesian"] for r in words if r.get("indonesian"))
     texts.extend(r["indonesian"] for r in sentences if r.get("indonesian"))
     texts.extend(r["indonesian"] for r in scenes if r.get("indonesian"))
     texts.extend(r["example"] for r in letters if r.get("example"))
     return list(dict.fromkeys(texts))
 
-def count_cjk_in_vocabulary(rows):
-    import re
-    pattern = re.compile(r"[\u3400-\u4dbf\u4e00-\u9fff]")
-    return sum(1 for row in rows if pattern.search(row.get("indonesian", "")))
+
+def count_cjk_in_vocabulary(rows) -> int:
+    return sum(1 for row in rows if CJK_PATTERN.search(row.get("indonesian", "")))
+
 
 def scan_forbidden():
     hits = []
@@ -56,6 +62,7 @@ def scan_forbidden():
             if token.lower() in text.lower():
                 hits.append((str(path.relative_to(ROOT)), token))
     return hits
+
 
 def main():
     parser = argparse.ArgumentParser()
@@ -80,31 +87,40 @@ def main():
 
     word_ids = [r["id"] for r in words if r.get("id")]
     indonesian_keys = [r["indonesian"].strip() for r in words if r.get("indonesian")]
-    print(f"WORD_DUPLICATE_IDS = {len(word_ids) - len(set(word_ids))}")
-    print(f"WORD_DUPLICATE_AUDIO_KEYS = {len(indonesian_keys) - len(set(indonesian_keys))}")
+    duplicate_word_ids = len(word_ids) - len(set(word_ids))
+    duplicate_audio_words = len(indonesian_keys) - len(set(indonesian_keys))
     invalid_indonesian = count_cjk_in_vocabulary(words)
+
+    print(f"WORD_DUPLICATE_IDS = {duplicate_word_ids}")
+    print(f"WORD_DUPLICATE_AUDIO_KEYS = {duplicate_audio_words}")
     print(f"INVALID_INDONESIAN_TEXT = {invalid_indonesian}")
 
     texts = collect_audio_texts(words, sentences, scenes, letters)
+
     index_path = ASSETS / "tts_index.tsv"
-    index = {}
+    index: dict[str, dict[str, str]] = {}
     duplicate_audio_keys = 0
+
     if index_path.exists():
         for row in read_tsv(index_path):
-            text = row.get("original_text", "").strip()
-            key = row.get("sha256", "").strip()
-            if text and key:
-                if key in index:
-                    duplicate_audio_keys += 1
-                index[key] = row
+            original_text = row.get("original_text", "").strip()
+            key = row.get("sha256", "").strip().lower()
+            if not original_text or not key:
+                continue
+            if key in index:
+                duplicate_audio_keys += 1
+                continue
+            index[key] = row
 
-    missing = [t for t in texts if sha256(t) not in index]
+    missing = [text for text in texts if sha256(text) not in index]
     real = len(texts) - len(missing)
+
     print(f"TOTAL_AUDIO_TEXTS = {len(texts)}")
     print(f"REAL_AUDIO = {real}")
     print(f"MISSING_AUDIO = {len(missing)}")
     print(f"INDEXED_AUDIO = {len(index)}")
     print(f"DUPLICATE_AUDIO_KEYS = {duplicate_audio_keys}")
+
     licensed = sum(1 for row in index.values() if row.get("license", "").strip())
     print(f"LICENSED_AUDIO = {licensed}")
     print(f"AUDIO_ASSET_PRESENT = {(ASSETS / 'tts_audio.m4a').exists()}")
@@ -114,23 +130,31 @@ def main():
     for path, token in forbidden_hits:
         print(f"FORBIDDEN: {path}: {token}")
 
-    problems = []
+    problems: list[str] = []
+
     if len(words) < 3020:
         problems.append(f"VOCABULARY_COUNT < 3020 ({len(words)})")
     if len(sentences) != 40:
         problems.append(f"SENTENCE_COUNT != 40 ({len(sentences)})")
     if len(set(r["scene_id"] for r in scenes)) != 10:
         problems.append("SCENE_COUNT != 10")
-    scene_turn_counts = {}
+
+    scene_turn_counts: dict[str, int] = {}
     for row in scenes:
-        sid = row.get("scene_id", "")
+        scene_id = row.get("scene_id", "")
         turn = int(row.get("turn", "0") or 0)
-        scene_turn_counts[sid] = max(scene_turn_counts.get(sid, 0), turn)
+        scene_turn_counts[scene_id] = max(scene_turn_counts.get(scene_id, 0), turn)
     if any(count < 6 for count in scene_turn_counts.values()):
         problems.append("A_SCENE_HAS_FEWER_THAN_6_TURNS")
+
     if len(letters) != 26:
         problems.append(f"LETTER_COUNT != 26 ({len(letters)})")
-    if invalid_indonesian:\n        problems.append("INVALID_INDONESIAN_TEXT > 0")
+    if duplicate_word_ids:
+        problems.append("WORD_DUPLICATE_IDS > 0")
+    if duplicate_audio_words:
+        problems.append("WORD_DUPLICATE_AUDIO_KEYS > 0")
+    if invalid_indonesian:
+        problems.append("INVALID_INDONESIAN_TEXT > 0")
     if forbidden_hits:
         problems.append("FORBIDDEN_API_HITS > 0")
     if duplicate_audio_keys:
@@ -140,9 +164,10 @@ def main():
 
     if problems:
         print("PROBLEMS:")
-        for p in problems:
-            print(f"- {p}")
+        for problem in problems:
+            print(f"- {problem}")
         raise SystemExit(1)
+
 
 if __name__ == "__main__":
     main()
