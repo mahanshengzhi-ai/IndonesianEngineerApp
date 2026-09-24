@@ -5,10 +5,12 @@ import csv
 import hashlib
 import os
 import re
+import struct
 import subprocess
 import tempfile
 import time
 import unicodedata
+import wave
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from urllib.parse import quote, unquote
@@ -19,9 +21,9 @@ ROOT = Path(__file__).resolve().parents[1]
 ASSETS = ROOT / "app" / "src" / "main" / "assets"
 API_URL = "https://commons.wikimedia.org/w/api.php"
 CATEGORY = "Category:Lingua Libre pronunciation-ind"
-UA = "IndonesianEngineerApp/0.6 (redistributable human-recorded audio build)"
+UA = "IndonesianEngineerApp/0.7 (redistributable human-recorded audio build)"
 MAX_AUDIO = 3730
-DOWNLOAD_WORKERS = 6
+DOWNLOAD_WORKERS = 8
 CACHE_DIR = Path(os.environ.get("AUDIO_CACHE_DIR", "/tmp/indonesian-engineer-audio-cache"))
 
 TOKEN_RE = re.compile(r"[A-Za-zÀ-ÿ]+(?:'[A-Za-zÀ-ÿ]+)?", re.UNICODE)
@@ -57,16 +59,16 @@ DENIED_LICENSE_MARKERS = (
 def normalize(text: str) -> str:
     text = unicodedata.normalize("NFC", text or "")
     text = text.replace("_", " ")
-    return re.sub(r"s+", " ", text.strip()).lower()
+    return re.sub(r"\s+", " ", text.strip()).lower()
 
 
 def clean_html(text: str) -> str:
-    return re.sub(r"s+", " ", LICENSE_RE.sub("", text or "")).strip()
+    return re.sub(r"\s+", " ", LICENSE_RE.sub("", text or "")).strip()
 
 
 def read_tsv(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8", newline="") as f:
-        return list(csv.DictReader(f, delimiter="	"))
+        return list(csv.DictReader(f, delimiter="\t"))
 
 
 def desired_texts() -> list[str]:
@@ -213,8 +215,7 @@ def metadata_for_titles(
                 continue
 
             source_url = (
-                meta.get("LicenseUrl", {}).get("value")
-                or f"https://commons.wikimedia.org/wiki/{quote(title.replace(' ', '_'))}"
+                f"https://commons.wikimedia.org/wiki/{quote(title.replace(' ', '_'))}"
             )
             artist = clean_html(
                 meta.get("Artist", {}).get("value", "")
@@ -229,7 +230,7 @@ def metadata_for_titles(
                     "artist": artist,
                     "source_url": source_url,
                 }
-        time.sleep(0.4)
+        time.sleep(0.25)
     return output
 
 
@@ -243,18 +244,35 @@ def cache_path_for_title(title: str) -> Path:
     return source_dir / (hashlib.sha1(title.encode("utf-8")).hexdigest() + ".wav")
 
 
+def duration_ms(path: Path) -> int:
+    result = subprocess.run(
+        [
+            "ffprobe", "-v", "error",
+            "-show_entries", "format=duration",
+            "-of", "default=noprint_wrappers=1:nokey=1",
+            str(path),
+        ],
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return max(1, int(float(result.stdout.strip()) * 1000))
+
+
 def download_and_normalize(
     session_factory,
     title: str,
     meta: dict[str, str],
     out_dir: Path,
-) -> tuple[str, Path]:
+) -> tuple[str, Path, int]:
     cached = cache_path_for_title(title)
     if cached.exists() and cached.stat().st_size > 1000:
-        return title, cached
+        return title, cached, duration_ms(cached)
 
     session = session_factory()
-    raw = out_dir / (hashlib.sha1((title + ".source").encode("utf-8")).hexdigest() + ".bin")
+    raw = out_dir / (
+        hashlib.sha1((title + ".source").encode("utf-8")).hexdigest() + ".bin"
+    )
     normalized = cached
     delay = 2.0
 
@@ -289,7 +307,7 @@ def download_and_normalize(
                 check=True,
             )
             raw.unlink(missing_ok=True)
-            return title, normalized
+            return title, normalized, duration_ms(normalized)
         except (requests.RequestException, subprocess.CalledProcessError) as exc:
             raw.unlink(missing_ok=True)
             if attempt == 9:
@@ -298,25 +316,6 @@ def download_and_normalize(
             delay = min(delay * 1.8, 30.0)
 
     raise RuntimeError(f"download retry exhausted for {title}")
-
-
-def duration_ms(path: Path) -> int:
-    result = subprocess.run(
-        [
-            "ffprobe", "-v", "error",
-            "-show_entries", "format=duration",
-            "-of", "default=noprint_wrappers=1:nokey=1",
-            str(path),
-        ],
-        capture_output=True,
-        text=True,
-        check=True,
-    )
-    return max(1, int(float(result.stdout.strip()) * 1000))
-
-
-def sha256(text: str) -> str:
-    return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
 def resolve_audio_plans(
@@ -328,33 +327,50 @@ def resolve_audio_plans(
 
     for text in desired:
         key = normalize(text)
-        exact_candidates = title_index.get(key, [])
-
-        # Prefer one natural human recording of the full phrase.
-        exact_usable = [title for title in exact_candidates if title in metadata]
+        exact_usable = [
+            title for title in title_index.get(key, [])
+            if title in metadata
+        ]
         if exact_usable:
             resolved[key] = ("exact", [exact_usable[0]])
             continue
 
-        # Otherwise stitch real human-recorded word clips. No TTS or synthesis.
         tokens = tokenize_phrase(text)
         if not tokens:
             continue
 
         chosen: list[str] = []
-        possible = True
         for token in tokens:
-            candidates = title_index.get(token, [])
-            usable = next((title for title in candidates if title in metadata), None)
+            usable = next(
+                (
+                    title for title in title_index.get(token, [])
+                    if title in metadata
+                ),
+                None,
+            )
             if usable is None:
-                possible = False
                 break
             chosen.append(usable)
-
-        if possible and chosen:
-            resolved[key] = ("stitched", chosen)
+        else:
+            if chosen:
+                resolved[key] = ("stitched", chosen)
 
     return resolved
+
+
+def write_silence(path: Path, milliseconds: int) -> int:
+    frames = 24000 * milliseconds // 1000
+    with wave.open(str(path), "wb") as wav:
+        wav.setnchannels(1)
+        wav.setsampwidth(2)
+        wav.setframerate(24000)
+        zero_block = struct.pack("<h", 0) * 4096
+        remaining = frames
+        while remaining:
+            count = min(remaining, 4096)
+            wav.writeframes(zero_block[:count * 2])
+            remaining -= count
+    return frames * 1000 // 24000
 
 
 def main() -> None:
@@ -375,13 +391,11 @@ def main() -> None:
 
     titles = list_category_files(session)
     print("CATEGORY_FILES =", len(titles))
-
     title_index = build_title_index(titles)
-    candidate_titles: set[str] = set()
 
+    candidate_titles: set[str] = set()
     for text in desired:
-        key = normalize(text)
-        candidate_titles.update(title_index.get(key, []))
+        candidate_titles.update(title_index.get(normalize(text), []))
         for token in tokenize_phrase(text):
             candidate_titles.update(title_index.get(token, []))
 
@@ -394,146 +408,111 @@ def main() -> None:
     print("EXACT_RESOLVED =", sum(1 for kind, _ in resolved.values() if kind == "exact"))
     print("STITCHED_RESOLVED =", sum(1 for kind, _ in resolved.values() if kind == "stitched"))
 
-    if not resolved:
-        index_output.write_text(
-            "sha256\tstart_ms\tduration_ms\toriginal_text\tsource_file\tlicense\n",
-            encoding="utf-8",
-        )
-        attribution_output.write_text(
-            "source_file\tartist\tlicense\tsource_url\n",
-            encoding="utf-8",
-        )
-        print("INDEXED_AUDIO = 0")
-        print("MISSING_AUDIO =", len(desired))
-        print("AUDIO_ASSET_PRESENT = False")
-        return
+    index_rows: list[list[object]] = []
+    attribution: dict[str, dict[str, str]] = {}
 
-    with tempfile.TemporaryDirectory(prefix="indonesian-audio-") as temp_dir:
-        temp_root = Path(temp_dir)
+    if resolved:
+        with tempfile.TemporaryDirectory(prefix="indonesian-audio-") as temp_dir:
+            temp_root = Path(temp_dir)
+            silence_word = temp_root / "silence_80ms.wav"
+            silence_phrase = temp_root / "silence_120ms.wav"
+            word_gap_ms = write_silence(silence_word, 80)
+            phrase_gap_ms = write_silence(silence_phrase, 120)
 
-        def session_factory():
-            s = requests.Session()
-            s.headers["User-Agent"] = UA
-            return s
+            def session_factory():
+                s = requests.Session()
+                s.headers["User-Agent"] = UA
+                return s
 
-        source_titles_needed = sorted({
-            title
-            for kind, source_titles in resolved.values()
-            for title in source_titles
-        })
+            source_titles_needed = sorted({
+                title
+                for _, source_titles in resolved.values()
+                for title in source_titles
+            })
 
-        future_map = {}
-        with ThreadPoolExecutor(max_workers=DOWNLOAD_WORKERS) as executor:
-            for title in source_titles_needed:
-                future = executor.submit(
-                    download_and_normalize,
-                    session_factory,
-                    title,
-                    metadata[title],
-                    temp_root,
+            future_map = {}
+            with ThreadPoolExecutor(max_workers=DOWNLOAD_WORKERS) as executor:
+                for title in source_titles_needed:
+                    future = executor.submit(
+                        download_and_normalize,
+                        session_factory,
+                        title,
+                        metadata[title],
+                        temp_root,
+                    )
+                    future_map[future] = title
+
+                normalized_sources: dict[str, Path] = {}
+                source_durations: dict[str, int] = {}
+                for future in as_completed(future_map):
+                    title, path, duration = future.result()
+                    normalized_sources[title] = path
+                    source_durations[title] = duration
+
+            concat_file = temp_root / "final.concat.txt"
+            cursor_ms = 0
+            concat_lines: list[str] = []
+
+            for text in desired[:MAX_AUDIO]:
+                key = normalize(text)
+                if key not in resolved:
+                    continue
+
+                kind, source_titles = resolved[key]
+                phrase_start = cursor_ms
+
+                if kind == "exact":
+                    title = source_titles[0]
+                    concat_lines.append(
+                        f"file '{str(normalized_sources[title]).replace(chr(39), chr(39)+chr(92)+chr(39)+chr(39))}'\n"
+                    )
+                    cursor_ms += source_durations[title]
+                    licenses = [metadata[title]["license"]]
+                else:
+                    licenses = []
+                    for idx, title in enumerate(source_titles):
+                        concat_lines.append(
+                            f"file '{str(normalized_sources[title]).replace(chr(39), chr(39)+chr(92)+chr(39)+chr(39))}'\n"
+                        )
+                        cursor_ms += source_durations[title]
+                        licenses.append(metadata[title]["license"])
+                        if idx < len(source_titles) - 1:
+                            concat_lines.append(f"file '{silence_word}'\n")
+                            cursor_ms += word_gap_ms
+
+                concat_lines.append(f"file '{silence_phrase}'\n")
+                cursor_ms += phrase_gap_ms
+
+                source_label = (
+                    source_titles[0]
+                    if kind == "exact"
+                    else "STITCHED:" + "|".join(source_titles)
                 )
-                future_map[future] = title
+                index_rows.append([
+                    hashlib.sha256(text.encode("utf-8")).hexdigest(),
+                    phrase_start,
+                    cursor_ms - phrase_start,
+                    text,
+                    source_label,
+                    "; ".join(dict.fromkeys(licenses)),
+                ])
 
-            normalized_sources: dict[str, Path] = {}
-            for future in as_completed(future_map):
-                title, path = future.result()
-                normalized_sources[title] = path
+                for title in source_titles:
+                    attribution[title] = metadata[title]
 
-        ordered_files: list[Path] = []
-        rows = []
-        attribution: dict[str, dict[str, str]] = {}
-        cursor_ms = 0
+            concat_file.write_text("".join(concat_lines), encoding="utf-8")
 
-        for text in desired[:MAX_AUDIO]:
-            key = normalize(text)
-            if key not in resolved:
-                continue
-
-            kind, source_titles = resolved[key]
-            with tempfile.NamedTemporaryFile(
-                prefix="phrase-", suffix=".wav", dir=temp_root, delete=False
-            ) as phrase_file:
-                phrase_path = Path(phrase_file.name)
-
-            if kind == "exact":
-                source_path = normalized_sources[source_titles[0]]
-                subprocess.run(
-                    [
-                        "ffmpeg", "-y", "-loglevel", "error",
-                        "-i", str(source_path),
-                        "-af", "apad=pad_dur=0.12",
-                        "-ac", "1", "-ar", "24000",
-                        str(phrase_path),
-                    ],
-                    check=True,
-                )
-            else:
-                inputs = []
-                filter_parts = []
-                for idx, title in enumerate(source_titles):
-                    path = normalized_sources[title]
-                    inputs.extend(["-i", str(path)])
-                    filter_parts.append(f"[{idx}:a]apad=pad_dur=0.08[a{idx}]")
-                graph = ";".join(filter_parts)
-                mix_inputs = "".join(f"[a{i}]" for i in range(len(source_titles)))
-                graph += f";{mix_inputs}concat=n={len(source_titles)}:v=0:a=1[out]"
-                subprocess.run(
-                    [
-                        "ffmpeg", "-y", "-loglevel", "error",
-                        *inputs,
-                        "-filter_complex", graph,
-                        "-map", "[out]",
-                        "-ac", "1", "-ar", "24000",
-                        "-af", "volume=0.88,apad=pad_dur=0.12",
-                        str(phrase_path),
-                    ],
-                    check=True,
-                )
-
-            duration = duration_ms(phrase_path)
-            ordered_files.append(phrase_path)
-
-            if kind == "exact":
-                source_label = source_titles[0]
-            else:
-                source_label = "STITCHED:" + "|".join(source_titles)
-
-            licenses = []
-            for title in source_titles:
-                meta = metadata[title]
-                licenses.append(meta["license"])
-                attribution[title] = meta
-
-            rows.append([
-                sha256(text),
-                cursor_ms,
-                duration,
-                text,
-                source_label,
-                "; ".join(dict.fromkeys(licenses)),
-            ])
-            cursor_ms += duration
-
-        final_concat = temp_root / "final.concat.txt"
-        final_concat.write_text(
-            "".join(
-                f"file '{str(path).replace(chr(39), chr(39)+chr(92)+chr(39)+chr(39))}'\n"
-                for path in ordered_files
-            ),
-            encoding="utf-8",
-        )
-
-        subprocess.run(
-            [
-                "ffmpeg", "-y", "-loglevel", "error",
-                "-f", "concat", "-safe", "0",
-                "-i", str(final_concat),
-                "-c:a", "aac", "-b:a", "96k",
-                "-ar", "24000", "-ac", "1",
-                str(audio_output),
-            ],
-            check=True,
-        )
+            subprocess.run(
+                [
+                    "ffmpeg", "-y", "-loglevel", "error",
+                    "-f", "concat", "-safe", "0",
+                    "-i", str(concat_file),
+                    "-c:a", "aac", "-b:a", "96k",
+                    "-ar", "24000", "-ac", "1",
+                    str(audio_output),
+                ],
+                check=True,
+            )
 
     with index_output.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
@@ -541,7 +520,7 @@ def main() -> None:
             "sha256", "start_ms", "duration_ms",
             "original_text", "source_file", "license",
         ])
-        writer.writerows(rows)
+        writer.writerows(index_rows)
 
     with attribution_output.open("w", encoding="utf-8", newline="") as f:
         writer = csv.writer(f, delimiter="\t", lineterminator="\n")
@@ -555,8 +534,8 @@ def main() -> None:
                 meta.get("source_url", ""),
             ])
 
-    print("INDEXED_AUDIO =", len(rows))
-    print("MISSING_AUDIO =", len(desired) - len(rows))
+    print("INDEXED_AUDIO =", len(index_rows))
+    print("MISSING_AUDIO =", len(desired) - len(index_rows))
     print("AUDIO_ASSET_PRESENT =", audio_output.exists())
     print("AUDIO_ASSET_BYTES =", audio_output.stat().st_size if audio_output.exists() else 0)
     print("ATTRIBUTION_ENTRIES =", len(attribution))
