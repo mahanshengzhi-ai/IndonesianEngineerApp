@@ -9,7 +9,8 @@ import java.util.Locale
 class ProgressStore(context: Context) {
     private val prefs = context.getSharedPreferences("learning_progress", Context.MODE_PRIVATE)
 
-    private fun today(): String = SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
+    private fun today(): String =
+        SimpleDateFormat("yyyy-MM-dd", Locale.US).format(Date())
 
     fun markLearned(id: String) {
         if (isLearned(id)) return
@@ -55,21 +56,25 @@ class ProgressStore(context: Context) {
 
     fun checkIn() {
         val todayKey = today()
-        val editor = prefs.edit()
-        if (!prefs.getBoolean("checkin_" + todayKey, false)) {
-            val previous = previousDate()
-            val streak = if (prefs.getBoolean("checkin_" + previous, false)) {
-                prefs.getInt("streak", 0) + 1
-            } else {
-                1
-            }
-            editor.putBoolean("checkin_" + todayKey, true)
-                .putString("last_checkin", todayKey)
-                .putInt("streak", streak)
-                .putInt("checkins", prefs.getInt("checkins", 0) + 1)
-                .apply()
+        if (isCheckedInToday()) return
+
+        val previous = previousDate()
+        val streak = if (prefs.getBoolean("checkin_" + previous, false)) {
+            prefs.getInt("streak", 0) + 1
+        } else {
+            1
         }
+
+        prefs.edit()
+            .putBoolean("checkin_" + todayKey, true)
+            .putString("last_checkin", todayKey)
+            .putInt("streak", streak)
+            .putInt("checkins", prefs.getInt("checkins", 0) + 1)
+            .apply()
     }
+
+    fun isCheckedInToday(): Boolean =
+        prefs.getBoolean("checkin_" + today(), false)
 
     fun checkins(): Int = prefs.getInt("checkins", 0)
     fun streak(): Int = prefs.getInt("streak", 0)

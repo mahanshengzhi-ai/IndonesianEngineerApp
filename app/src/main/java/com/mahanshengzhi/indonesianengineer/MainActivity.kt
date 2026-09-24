@@ -127,18 +127,26 @@ class MainActivity : AppCompatActivity() {
                 progress.dailyAudio(),
                 progress.dailyQuiz(),
                 progress.dailyTranslation(),
+                progress.dailySentences(),
+                progress.dailyScene(),
+                progress.isCheckedInToday(),
                 onStart = { bottomNavigation.selectedItemId = R.id.nav_learn },
                 onCheckIn = {
                     progress.checkIn()
                     Toast.makeText(this, "今日已打卡，明天继续", Toast.LENGTH_SHORT).show()
                     renderPage(R.id.nav_home)
                 },
-                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn }
+                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn },
+                onOpenPractice = { bottomNavigation.selectedItemId = R.id.nav_practice }
             )
 
             R.id.nav_learn -> StudyPage.build(
                 this,
                 repository,
+                progress.dailyWords(),
+                progress.dailySentences(),
+                progress.dailyScene(),
+                progress.dailyQuiz(),
                 audioPlayer::hasAudio,
                 ::playAudio,
                 onOpenPronunciation = {
@@ -157,11 +165,13 @@ class MainActivity : AppCompatActivity() {
                             this,
                             repository,
                             audioPlayer::hasAudio,
-                            ::playAudio
-                        ) {
-                            progress.markLearned(it)
-                            progress.markDailyWord()
-                        }
+                            ::playAudio,
+                            onLearned = {
+                                progress.markLearned(it)
+                                progress.markDailyWord()
+                            },
+                            isLearned = progress::isLearned
+                        )
                     )
                 },
                 onOpenSentences = {
@@ -170,7 +180,8 @@ class MainActivity : AppCompatActivity() {
                             this,
                             repository,
                             audioPlayer::hasAudio,
-                            ::playAudio
+                            ::playAudio,
+                            progress::markDailySentence
                         )
                     )
                 },
@@ -183,7 +194,8 @@ class MainActivity : AppCompatActivity() {
                                     repository,
                                     id,
                                     audioPlayer::hasAudio,
-                                    ::playAudio
+                                    ::playAudio,
+                                    progress::markDailyScene
                                 )
                             )
                         }
@@ -229,9 +241,13 @@ class MainActivity : AppCompatActivity() {
                 progress.dailyAudio(),
                 progress.dailyQuiz(),
                 progress.dailyTranslation(),
+                progress.dailySentences(),
+                progress.dailyScene(),
+                progress.isCheckedInToday(),
                 onStart = { bottomNavigation.selectedItemId = R.id.nav_learn },
                 onCheckIn = {},
-                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn }
+                onOpenStudy = { bottomNavigation.selectedItemId = R.id.nav_learn },
+                onOpenPractice = { bottomNavigation.selectedItemId = R.id.nav_practice }
             )
         }
 
