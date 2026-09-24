@@ -158,7 +158,7 @@ def main() -> None:
             item.source,
             "BUILD_TIME_SYNTHETIC_VOICE",
         ))
-        list_lines.append(f"file '{path.as_posix().replace("'", "'\\''")}'")
+        list_lines.append(f"file {shlex.quote(path.as_posix())}")
         list_lines.append(f"file {shlex.quote(silence.as_posix())}")
         current_ms += duration_ms + PAUSE_MS
 
