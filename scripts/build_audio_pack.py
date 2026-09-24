@@ -377,15 +377,9 @@ def main() -> int:
     cache_root.mkdir(parents=True, exist_ok=True)
 
     print("Required unique learning texts:", len(required_texts))
-    print("Downloading Lingua Libre Indonesian dataset...")
-    dataset_zip_path = download_dataset_zip(cache_root)
-    with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
-        zip_names = build_zip_name_map(dataset_zip)
-
     print("Querying Wikimedia Commons category:", CATEGORY)
     files = fetch_category_files()
-    files = [item for item in files if item["title"] in zip_names]
-    print("Current Commons files also present in dataset:", len(files))
+    print("Current Commons category WAV files:", len(files))
 
     exact_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
     supplemental_candidates: dict[str, list[dict[str, Any]]] = defaultdict(list)
@@ -471,14 +465,12 @@ def main() -> int:
     audio_path = assets / "tts_audio.m4a"
     index_path = assets / "tts_index.tsv"
 
-    with zipfile.ZipFile(dataset_zip_path, "r") as dataset_zip:
-        with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
-            rows = make_concat_audio(
-                selected,
-                Path(temp_dir),
-                audio_path,
-                dataset_zip,
-            )
+    with tempfile.TemporaryDirectory(prefix="indonesian_audio_") as temp_dir:
+        rows = make_concat_audio(
+            selected,
+            Path(temp_dir),
+            audio_path,
+        )
 
     write_index(index_path, rows)
 
