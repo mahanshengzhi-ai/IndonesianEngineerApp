@@ -6,7 +6,7 @@ W0037	data proyek	项目数据	项目管理	项目管理
 W0048	proyek sementara	临时项目	项目管理	项目管理		
 W0059	ukuran lapangan	现场尺寸	现场管理	现场管理		
 W0070	risiko lapangan	现场风险	现场管理	现场管理		
-W0081	lokasi proyek	工地位置	现场管理	现场管理		
+W0081	lokasi lapangan	工地位置	现场管理	现场管理		
 W0092	persiapan lokasi konstruksi	工地准备	现场管理	现场管理		
 W0103	pekerjaan proyek teknik	工程作业	项目管理	项目管理		
 W0114	kualitas proyek teknik	工程质量	项目管理	项目管理		
@@ -236,7 +236,6 @@ W2798	catatan gambar konstruksi	施工图记录	技术	技术
 W2809	pemeriksaan gambar detail	检查详图	技术	技术		
 W2820	data gambar detail	详图数据	技术	技术		
 W2831	gambar detail sementara	临时详图	技术	技术		
-W2842	gambar gambar penampang	剖面图图纸	技术	技术		
 W2853	gambar penampang utama	主要剖面图	技术	技术		
 W2875	pemeriksaan akhir gambar denah	平面图最终检查	技术	技术		
 W2886	kondisi detail titik	节点状态	技术	技术		
